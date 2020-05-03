@@ -22,7 +22,8 @@
     }
   },
   "dependencies": {
-    "@stoqey/aurum-broker-spec": "^0.0.1"
+    "@stoqey/aurum-broker-spec": "^0.0.1",
+    "@stoqey/mille": "^0.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",

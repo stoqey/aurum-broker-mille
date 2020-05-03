@@ -1,13 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille'
 import { Broker, BrokerMethods } from "@stoqey/aurum-broker-spec";
 import { isTest } from "./config";
 
-export class MilleBroker extends Broker implements BrokerMethods {
 
+// milleEvents.emit(MILLEEVENTS.GET_DATA, ["AAPL", "MSFT"])
+
+export class MilleBroker extends Broker implements BrokerMethods { 
     // events = {} as any;
 
+    milleEvents: MilleEvents;
     constructor() {
         super();
+
+        this.milleEvents = MilleEvents.Instance;
 
         if (isTest) {
             // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -18,6 +24,10 @@ export class MilleBroker extends Broker implements BrokerMethods {
             }, 1000)
         }
 
+        // TODO init mille
+        // 
+        mille();
+
     }
 
     public async getAllPositions(): Promise<any> {
@@ -25,27 +35,34 @@ export class MilleBroker extends Broker implements BrokerMethods {
     }
 
     public async enterPosition(portfolio: any[]): Promise<any> {
+         // use finnhub
         return null;
     }
 
     public async exitPosition(portfolio: any[]): Promise<any> {
+         // use finnhub
         return null;
     }
 
     public async searchSymbol(symbol: string, symbolType: string): Promise<any> {
+        // use finnhub
         return null;
 
     }
     public async quoteSymbol(symbol: string, symbolType: string): Promise<any> {
+        // use finnhub
         return null;
     }
 
     public async getMarketData(symbol: string, symbolType: string): Promise<any> {
+        // Can use finnhub
         return null;
     }
 
+    // Complete
     public async getPriceUpdate(symbol: string, symbolType: string): Promise<any> {
-        return null;
+        this.milleEvents.emit(MILLEEVENTS.GET_DATA, [symbol]);
+        return symbol;
     };
 
 }
