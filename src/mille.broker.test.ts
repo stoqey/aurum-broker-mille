@@ -3,13 +3,23 @@ import { MilleBroker } from '.';
 
 const milleBroker = new MilleBroker();
 
-describe('Mille broker demo', () => {
+before((done) => {
+    milleBroker.sub('onReady', async () => {
+        console.log('on ready');
+        done();
+    });
+});
 
-    it(`Fake trade `, (done) => {
-        milleBroker.sub("onTrade", async (data: any) => {
-            console.log('data is', data);
+describe('Mille broker', () => {
+
+    it(`Price updates`, (done) => {
+
+        milleBroker.sub("onPriceUpdate", async (data: any) => {
+            console.log('on price updates data is', data);
             done();
         });
+
+        milleBroker.getPriceUpdate("AAPL");
     })
 
 })
