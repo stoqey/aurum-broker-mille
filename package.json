@@ -21,7 +21,9 @@
       "pre-commit": "lint-staged"
     }
   },
-  "dependencies": {},
+  "dependencies": {
+    "@stoqey/aurum-broker-spec": "^0.0.1"
+  },
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/lodash": "^4.14.149",

@@ -1,5 +1,5 @@
 import 'mocha';
-import { MilleBroker } from './mille.broker';
+import { MilleBroker } from '.';
 
 const milleBroker = new MilleBroker();
 
