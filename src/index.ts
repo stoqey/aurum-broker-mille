@@ -79,8 +79,14 @@ export class MilleBroker extends Broker implements BrokerMethods {
         return this.accountSummary;
     }
 
-    getAllOrders: () => Promise<any>;
-    getOpenOrders: () => Promise<any>;
+    getAllOrders(): Promise<any> {
+        return null;
+    }
+
+    getOpenOrders(): Promise<any> {
+        return null;
+    }
+
 
     public async getAllPositions(): Promise<any> {
         return this.portfolios;
