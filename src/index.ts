@@ -1,23 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { isTest } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille'
-import { Broker, BrokerMethods } from "@stoqey/aurum-broker-spec";
+import { Broker, BrokerMethods, BrokerAccountSummary } from "@stoqey/aurum-broker-spec";
 
-interface AccountSummary {
-    accountId: string,
-    totalCashValue: number,
-}
-const virtualBrokerState: AccountSummary = {
+const virtualBrokerState: BrokerAccountSummary = {
     accountId: 'VIRTUAL',
     totalCashValue: 3000,
 };
 
 export class MilleBroker extends Broker implements BrokerMethods {
-    // events = {} as any;
+
     /**
      * Emulated broker account summary
      */
-    accountSummary: AccountSummary = virtualBrokerState;
+    accountSummary: BrokerAccountSummary = virtualBrokerState;
+
+    portfolios: any[] = []
 
     milleEvents: MilleEvents;
     constructor(date?: Date) {
@@ -77,7 +75,7 @@ export class MilleBroker extends Broker implements BrokerMethods {
 
         });
     }
-    public async getAccountSummary(): Promise<AccountSummary> {
+    public async getAccountSummary(): Promise<BrokerAccountSummary> {
         return this.accountSummary;
     }
 
@@ -85,7 +83,7 @@ export class MilleBroker extends Broker implements BrokerMethods {
     getOpenOrders: () => Promise<any>;
 
     public async getAllPositions(): Promise<any> {
-        return {}
+        return this.portfolios;
     }
 
     public async enterPosition(portfolio: any[]): Promise<any> {
