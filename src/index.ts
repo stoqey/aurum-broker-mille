@@ -1,13 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { isTest } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille'
-import { Broker, BrokerMethods, BrokerEvents } from "@stoqey/aurum-broker-spec";
+import { Broker, BrokerMethods } from "@stoqey/aurum-broker-spec";
 
-
-// milleEvents.emit(MILLEEVENTS.GET_DATA, ["AAPL", "MSFT"])
+interface AccountSummary {
+    accountId: string,
+    totalCashValue: number,
+}
+const virtualBrokerState: AccountSummary = {
+    accountId: 'VIRTUAL',
+    totalCashValue: 3000,
+};
 
 export class MilleBroker extends Broker implements BrokerMethods {
     // events = {} as any;
+    /**
+     * Emulated broker account summary
+     */
+    accountSummary: AccountSummary = virtualBrokerState;
 
     milleEvents: MilleEvents;
     constructor(date?: Date) {
@@ -24,7 +34,7 @@ export class MilleBroker extends Broker implements BrokerMethods {
         if (isTest) {
             // fake trade
             setInterval(() => {
-                const onTrade = self.events["onTrade"];
+                const onTrade = self.events["onOrder"];
                 onTrade && onTrade({ done: new Date });
             }, 1000)
         }
@@ -32,13 +42,13 @@ export class MilleBroker extends Broker implements BrokerMethods {
         // Init mille
         mille({ date, debug: false });
 
-        // Fake start
+        // start after delay
         setTimeout(() => {
             const onReady = self.events["onReady"];
             if (onReady) {
                 onReady({});
             }
-        }, 3000);
+        }, 2000);
 
 
     }
@@ -54,7 +64,6 @@ export class MilleBroker extends Broker implements BrokerMethods {
         const milleEvents = this.milleEvents;
 
 
-
         /**
          * Register all events here
          */
@@ -68,7 +77,10 @@ export class MilleBroker extends Broker implements BrokerMethods {
 
         });
     }
-    getAccountSummary: () => Promise<any>;
+    public async getAccountSummary(): Promise<AccountSummary> {
+        return this.accountSummary;
+    }
+
     getAllOrders: () => Promise<any>;
     getOpenOrders: () => Promise<any>;
 
