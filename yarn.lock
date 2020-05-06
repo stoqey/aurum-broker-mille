@@ -37,10 +37,10 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@stoqey/aurum-broker-spec@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@stoqey/aurum-broker-spec/-/aurum-broker-spec-0.0.2.tgz#11049a7ce9c999ff9d7fafd57aa58bc5bcdc14b2"
-  integrity sha512-605k64Gnr0n1iU3nkQJbjP9dNJ9TACyE+CMPzTvThLbUKvpdUJHF6P+bT/4d9SyDIODLs89rZjeyVXnTqZx4Rg==
+"@stoqey/aurum-broker-spec@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@stoqey/aurum-broker-spec/-/aurum-broker-spec-0.0.5.tgz#a662db098a1571b23e534ca436ad41958a9aa2f4"
+  integrity sha512-F47CdAt5I880nu+ZorjkV4TrtDKCjv2QXRxmDO4nFPY9Ssty0Cp5aaN/yImACLnQGgBk5pwQFD0wpbDCqudOMQ==
 
 "@types/chai@^4.2.11":
   version "4.2.11"

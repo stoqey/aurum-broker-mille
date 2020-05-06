@@ -10,7 +10,9 @@
     "build": "rm -rf build && tsc",
     "test": "NODE_ENV=test mocha src/*test.ts --exit",
     "eslint": "eslint src --fix --ext=ts",
-    "local": "yarn build && yarn link"
+    "local": "yarn build && yarn link",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn test"
   },
   "lint-staged": {
     "./src/**/*.ts": [
@@ -23,7 +25,7 @@
     }
   },
   "dependencies": {
-    "@stoqey/aurum-broker-spec": "^0.0.2",
+    "@stoqey/aurum-broker-spec": "^0.0.5",
     "dotenv": "^8.2.0"
   },
   "devDependencies": {
