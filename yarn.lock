@@ -51,6 +51,17 @@
     csvtojson "^2.0.10"
     moment "^2.24.0"
 
+"@stoqey/finnhub@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@stoqey/finnhub/-/finnhub-0.0.6.tgz#b2d377ea88ea10e266d783c420428bc535671d09"
+  integrity sha512-ntW8Z8CKfbobdOSM8SpMldwwYQIY3Fr9lWeFusQu4mbKB15BMx0rhWL/ewlJt9ZuIolB1OtxcAyqOWmxpjQ9bA==
+  dependencies:
+    axios "^0.19.2"
+    csvtojson "^2.0.10"
+    moment "^2.25.1"
+    moment-business-time "^1.0.0"
+    ws "^7.2.5"
+
 "@stoqey/mille@^0.0.3":
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/@stoqey/mille/-/mille-0.0.3.tgz#977e740e24474ab64171295439c303f1b05c0e7b"
@@ -2102,7 +2113,7 @@ mimic-fn@^2.1.0:
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-2.1.0.tgz#7ed2c2ccccaf84d3ffcb7a69b57711fc2083401b"
   integrity sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==
 
-minimatch@3.0.4, minimatch@^3.0.4:
+minimatch@3.0.4, minimatch@^3.0.3, minimatch@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   integrity sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==
@@ -2159,7 +2170,15 @@ mocha@^7.1.1:
     yargs-parser "13.1.2"
     yargs-unparser "1.6.0"
 
-moment@^2.24.0:
+moment-business-time@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/moment-business-time/-/moment-business-time-1.0.0.tgz#0e00c127c775eddb6c38150a61e10b5279c70543"
+  integrity sha512-KCb9e23vxPOXHijxU5LL+p9D2FmxngJXctvkgRP9DDoV3zZ1DI5NMVQMUnt17bQF80sZVEePPg3epbvIFu3YLQ==
+  dependencies:
+    minimatch "^3.0.3"
+    moment "^2.24.0"
+
+moment@^2.24.0, moment@^2.25.1:
   version "2.25.3"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.25.3.tgz#252ff41319cf41e47761a1a88cab30edfe9808c0"
   integrity sha512-PuYv0PHxZvzc15Sp8ybUCoQ+xpyPWvjOuK72a5ovzp2LI32rJXOiIfyoFoYvG3s6EwwrdkMyWuRiEHSZRLJNdg==
@@ -3393,6 +3412,11 @@ write@1.0.3:
   integrity sha512-/lg70HAjtkUgWPVZhZcm+T4hkL8Zbtp1nFNOn3lRrxnlv50SRBv7cR7RqR+GMsd3hUXy9hWBo4CHTbFTcOYwig==
   dependencies:
     mkdirp "^0.5.1"
+
+ws@^7.2.5:
+  version "7.2.5"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-7.2.5.tgz#abb1370d4626a5a9cd79d8de404aa18b3465d10d"
+  integrity sha512-C34cIU4+DB2vMyAbmEKossWq2ZQDr6QEyuuCzWrM9zfw1sGc0mYiJ0UnG9zzNykt49C2Fi34hvr2vssFQRS6EA==
 
 xdg-basedir@^3.0.0:
   version "3.0.0"
