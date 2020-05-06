@@ -51,10 +51,10 @@
     csvtojson "^2.0.10"
     moment "^2.24.0"
 
-"@stoqey/finnhub@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@stoqey/finnhub/-/finnhub-0.0.6.tgz#b2d377ea88ea10e266d783c420428bc535671d09"
-  integrity sha512-ntW8Z8CKfbobdOSM8SpMldwwYQIY3Fr9lWeFusQu4mbKB15BMx0rhWL/ewlJt9ZuIolB1OtxcAyqOWmxpjQ9bA==
+"@stoqey/finnhub@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@stoqey/finnhub/-/finnhub-0.0.7.tgz#3d31e120e6051f2b0fe326a34b27dedcc0e8c326"
+  integrity sha512-ojV6MmJXpcLwaUIzTVFytLY8KycFbs59ic1D6vLNfvBFKR9dFtHg5vfHoeIQ5/AID0V6AAbXMEzUyDq4sJRPhQ==
   dependencies:
     axios "^0.19.2"
     csvtojson "^2.0.10"

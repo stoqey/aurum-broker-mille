@@ -1,12 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { isTest } from "./config";
-import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille'
+import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
+import FinnhubAPI from '@stoqey/finnhub';
 import { Broker, BrokerMethods, BrokerAccountSummary } from "@stoqey/aurum-broker-spec";
 
 const virtualBrokerState: BrokerAccountSummary = {
     accountId: 'VIRTUAL',
     totalCashValue: 3000,
 };
+
+enum customEvents {
+    ON_MARKET_DATA = 'on_market_data',
+    GET_MARKET_DATA = 'get_market_data'
+};
+
+interface GetMarketData {
+    symbol: string,
+    startDate: Date,
+    endDate?: Date,
+    symbolType?: string
+}
 
 export class MilleBroker extends Broker implements BrokerMethods {
 
@@ -74,6 +87,24 @@ export class MilleBroker extends Broker implements BrokerMethods {
             }
 
         });
+
+        milleEvents.on(customEvents.GET_MARKET_DATA, ({ symbol, startDate, endDate, range }) => {
+            const finnhub = new FinnhubAPI(process.env.FINNHUB_KEY);
+
+            async function getData() {
+                const data = await finnhub.getCandles(symbol, startDate, endDate, range || '1');
+                milleEvents.emit(customEvents.ON_MARKET_DATA, data);
+            }
+            getData();
+        });
+
+        milleEvents.on(customEvents.ON_MARKET_DATA, (data) => {
+            const onMarketData = self.events["onMarketData"];
+
+            if (onMarketData) {
+                onMarketData(data);
+            }
+        });
     }
     public async getAccountSummary(): Promise<BrokerAccountSummary> {
         return this.accountSummary;
@@ -112,7 +143,10 @@ export class MilleBroker extends Broker implements BrokerMethods {
         return null;
     }
 
-    public async getMarketData(symbol: string, symbolType: string): Promise<any> {
+    // @ts-ignore
+    public async getMarketData(args: GetMarketData): Promise<any> {
+        const { symbol, startDate, endDate } = args;
+        this.milleEvents.emit(customEvents.GET_MARKET_DATA, { symbol, startDate, endDate });
         // Can use finnhub
         return null;
     }

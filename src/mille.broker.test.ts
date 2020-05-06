@@ -22,4 +22,16 @@ describe('Mille broker', () => {
         milleBroker.getPriceUpdate("AAPL");
     })
 
+    it(`MarketData`, (done) => {
+
+        const startDate = new Date("2020-03-10 09:30:00");
+        const endDate = new Date("2020-03-13 09:30:00");
+
+        milleBroker.when("onMarketData", async (data: any[]) => {
+            console.log('got market data', data.length);
+            done();
+        });
+
+        milleBroker.getMarketData({ symbol: "AAPL", startDate, endDate });
+    })
 })
