@@ -27,8 +27,8 @@ describe('Mille broker', () => {
         const startDate = new Date("2020-03-10 09:30:00");
         const endDate = new Date("2020-03-13 09:30:00");
 
-        milleBroker.when("onMarketData", async (data: any[]) => {
-            console.log('got market data', data.length);
+        milleBroker.when("onMarketData", async ({ marketData = [], symbol }) => {
+            console.log('got market data' + symbol, marketData.length);
             done();
         });
 
