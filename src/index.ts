@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import moment from 'moment';
 import { isTest } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
 import FinnhubAPI from '@stoqey/finnhub';
@@ -13,6 +14,7 @@ enum customEvents {
     ON_MARKET_DATA = 'on_market_data',
     GET_MARKET_DATA = 'get_market_data',
     ADD_PORTFOLIO = 'add_portfolio',
+    ON_PORTFOLIO = 'on_portfolio',
     CREATE_ORDER = 'create_order'
 };
 
@@ -23,6 +25,20 @@ interface GetMarketData {
     symbolType?: string
 }
 
+interface Portfolio {
+    symbol: string;
+    position: number;
+    costPrice: number;
+    marketPrice: number;
+}
+
+interface Order {
+    symbol: string;
+    type: 'BUY' | 'SELL',
+    position: number; // number of share we want
+    filled: number; // number of shares bought
+}
+
 export class MilleBroker extends Broker implements BrokerMethods {
 
     /**
@@ -30,7 +46,7 @@ export class MilleBroker extends Broker implements BrokerMethods {
      */
     accountSummary: BrokerAccountSummary = virtualBrokerState;
 
-    portfolios: any[] = [];
+    portfolios: Portfolio[] = [];
 
     startDate: Date;
 
@@ -67,9 +83,15 @@ export class MilleBroker extends Broker implements BrokerMethods {
             }
         }, 2000);
 
-
     }
 
+    /**
+     * getPublicTime
+     */
+    public getPublicTime() {
+        const timeAsString = moment(this.startDate).format("DD-MM-YYYY");
+        return timeAsString;
+    }
     /**
      * init
      */
@@ -135,7 +157,7 @@ export class MilleBroker extends Broker implements BrokerMethods {
         return this.portfolios;
     }
 
-    public async enterPosition(portfolio: any[]): Promise<any> {
+    public async enterPosition(portfolio: Portfolio & any): Promise<any> {
         // setTimeout, 
         // -> createOrder BUY/SELL
         // -> emit onOrder
@@ -145,13 +167,27 @@ export class MilleBroker extends Broker implements BrokerMethods {
         return null;
     }
 
-    public async exitPosition(portfolio: any[]): Promise<any> {
+    public async exitPosition(portfolio: Portfolio & any): Promise<any> {
         // setTimeout, 
+        // Get if current position exists
         // -> createOrder BUY/SELL for exit
         // -> emit onOrder
         // -> fillOrder
         // -> emit onOrder
         // -> updatePortfolios
+        setTimeout(() => {
+            async function exitPosition() {
+                try {
+
+
+
+
+                }
+                catch (error) {
+                    console.log('error exiting position', error);
+                }
+            }
+        }, 2000);
         return null;
     }
 
