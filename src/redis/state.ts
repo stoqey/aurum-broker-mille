@@ -1,4 +1,5 @@
 import ioredis, { Redis } from "ioredis";
+import { REDIS_HOST } from "../config";
 
 /**
  * Save state
@@ -18,7 +19,7 @@ export class State {
     }
 
     private constructor() {
-        this.redis = new ioredis();
+        this.redis = new ioredis(null, REDIS_HOST);
     }
 
     /**
