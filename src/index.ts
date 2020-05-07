@@ -93,7 +93,7 @@ export class MilleBroker extends Broker implements BrokerMethods {
 
             async function getData() {
                 const data = await finnhub.getCandles(symbol, startDate, endDate, range || '1');
-                milleEvents.emit(customEvents.ON_MARKET_DATA, data);
+                milleEvents.emit(customEvents.ON_MARKET_DATA, { symbol, marketData: data });
             }
             getData();
         });
