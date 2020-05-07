@@ -11,7 +11,9 @@ const virtualBrokerState: BrokerAccountSummary = {
 
 enum customEvents {
     ON_MARKET_DATA = 'on_market_data',
-    GET_MARKET_DATA = 'get_market_data'
+    GET_MARKET_DATA = 'get_market_data',
+    ADD_PORTFOLIO = 'add_portfolio',
+    CREATE_ORDER = 'create_order'
 };
 
 interface GetMarketData {
@@ -28,7 +30,9 @@ export class MilleBroker extends Broker implements BrokerMethods {
      */
     accountSummary: BrokerAccountSummary = virtualBrokerState;
 
-    portfolios: any[] = []
+    portfolios: any[] = [];
+
+    startDate: Date;
 
     milleEvents: MilleEvents;
     constructor(date?: Date) {
@@ -37,6 +41,8 @@ export class MilleBroker extends Broker implements BrokerMethods {
         this.milleEvents = MilleEvents.Instance;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
+
+        this.startDate = date;
 
         // init all listeners
         this.init();
@@ -88,6 +94,9 @@ export class MilleBroker extends Broker implements BrokerMethods {
 
         });
 
+        /**
+         * Get market data
+         */
         milleEvents.on(customEvents.GET_MARKET_DATA, ({ symbol, startDate, endDate, range }) => {
             const finnhub = new FinnhubAPI(process.env.FINNHUB_KEY);
 
@@ -98,6 +107,9 @@ export class MilleBroker extends Broker implements BrokerMethods {
             getData();
         });
 
+        /**
+         * On market data received
+         */
         milleEvents.on(customEvents.ON_MARKET_DATA, (data) => {
             const onMarketData = self.events["onMarketData"];
 
@@ -124,12 +136,22 @@ export class MilleBroker extends Broker implements BrokerMethods {
     }
 
     public async enterPosition(portfolio: any[]): Promise<any> {
-        // use finnhub
+        // setTimeout, 
+        // -> createOrder BUY/SELL
+        // -> emit onOrder
+        // -> fillOrder
+        // -> emit onOrder
+        // -> updatePortfolios
         return null;
     }
 
     public async exitPosition(portfolio: any[]): Promise<any> {
-        // use finnhub
+        // setTimeout, 
+        // -> createOrder BUY/SELL for exit
+        // -> emit onOrder
+        // -> fillOrder
+        // -> emit onOrder
+        // -> updatePortfolios
         return null;
     }
 
