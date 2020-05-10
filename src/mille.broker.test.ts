@@ -19,7 +19,7 @@ describe('Mille broker', () => {
             done();
         });
 
-        milleBroker.getPriceUpdate("AAPL");
+        milleBroker.getPriceUpdate({ symbol: "AAPL", startDate: null });
     })
 
     it(`MarketData`, (done) => {

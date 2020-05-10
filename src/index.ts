@@ -3,7 +3,7 @@ import moment from 'moment';
 import { isTest } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
 import FinnhubAPI from '@stoqey/finnhub';
-import { Broker, BrokerMethods, BrokerAccountSummary } from "@stoqey/aurum-broker-spec";
+import { Broker, BrokerAccountSummary, Portfolio, SymbolInfo, GetSymbolData, OpenOrder } from "@stoqey/aurum-broker-spec";
 
 const virtualBrokerState: BrokerAccountSummary = {
     accountId: 'VIRTUAL',
@@ -18,20 +18,6 @@ enum customEvents {
     CREATE_ORDER = 'create_order'
 };
 
-interface GetMarketData {
-    symbol: string,
-    startDate: Date,
-    endDate?: Date,
-    symbolType?: string
-}
-
-interface Portfolio {
-    symbol: string;
-    position: number;
-    costPrice: number;
-    marketPrice: number;
-}
-
 interface Order {
     symbol: string;
     type: 'BUY' | 'SELL',
@@ -39,8 +25,7 @@ interface Order {
     filled: number; // number of shares bought
 }
 
-export class MilleBroker extends Broker implements BrokerMethods {
-
+export class MilleBroker extends Broker {
     /**
      * Emulated broker account summary
      */
@@ -79,7 +64,7 @@ export class MilleBroker extends Broker implements BrokerMethods {
         setTimeout(() => {
             const onReady = self.events["onReady"];
             if (onReady) {
-                onReady({});
+                onReady(true);
             }
         }, 2000);
 
@@ -140,15 +125,23 @@ export class MilleBroker extends Broker implements BrokerMethods {
             }
         });
     }
-    public async getAccountSummary(): Promise<BrokerAccountSummary> {
+
+    public searchSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T[]> {
+        throw new Error("Method not implemented.");
+    }
+    public quoteSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T> {
+        throw new Error("Method not implemented.");
+    }
+
+    async getAccountSummary(): Promise<BrokerAccountSummary> {
         return this.accountSummary;
     }
 
-    getAllOrders(): Promise<any> {
+    public getAllOrders(): Promise<any> {
         return null;
     }
 
-    getOpenOrders(): Promise<any> {
+    public getOpenOrders(): Promise<any> {
         return null;
     }
 
@@ -191,18 +184,7 @@ export class MilleBroker extends Broker implements BrokerMethods {
         return null;
     }
 
-    public async searchSymbol(symbol: string, symbolType: string): Promise<any> {
-        // use finnhub
-        return null;
-
-    }
-    public async quoteSymbol(symbol: string, symbolType: string): Promise<any> {
-        // use finnhub
-        return null;
-    }
-
-    // @ts-ignore
-    public async getMarketData(args: GetMarketData): Promise<any> {
+    public async getMarketData(args: GetSymbolData): Promise<any> {
         const { symbol, startDate, endDate } = args;
         this.milleEvents.emit(customEvents.GET_MARKET_DATA, { symbol, startDate, endDate });
         // Can use finnhub
@@ -210,7 +192,8 @@ export class MilleBroker extends Broker implements BrokerMethods {
     }
 
     // Complete
-    public async getPriceUpdate(symbol: string, symbolType?: string): Promise<any> {
+    public async getPriceUpdate(args: GetSymbolData): Promise<any> {
+        const { symbol, startDate, endDate } = args;
         this.milleEvents.emit(MILLEEVENTS.GET_DATA, [symbol]);
         return symbol;
     };
