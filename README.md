@@ -39,6 +39,38 @@ A broker implementation for aurum using <a href="https://github.com/stoqey/mille
 | onPriceUpdate | ❌        |
 
 
+### Installation
+```bash
+npm i @stoqey/aurum-broker-ibkr
+```
+
+### Usage
+
+```ts
+import { MilleBroker } from '@stoqey/aurum-broker-mille';
+
+const broker = new MilleBroker();
+
+// register events
+broker.when('onReady', async () => {
+    console.log('Mille broker is ready');
+
+    // Get price updates
+    broker.getPriceUpdate({ symbol: "AAPL" });
+});
+
+broker.when("onPriceUpdate", async ({ symbol, close, ...others }) => {
+    console.log('on price updates data is', symbol);
+});
+
+
+// start the broker
+broker.init();
+
+
+```
+
+
 ## Other implementations
 - [Interactive brokers](https://github.com/stoqey/aurum-broker-ibkr)
 
