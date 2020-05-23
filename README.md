@@ -12,6 +12,8 @@
 A broker implementation for aurum using <a href="https://github.com/stoqey/mille">Mille paper trading</a>
 </p>
 
+####  [Aurum broker API v0.0.7](https://github.com/stoqey/aurum-broker-spec)
+
 ## Broker methods
 
 | Method            | Progress |
