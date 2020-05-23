@@ -147,6 +147,7 @@ export class MilleBroker extends Broker {
 
 
     public async getAllPositions(): Promise<any> {
+        // Refresh all portfolios and update state to all
         return this.portfolios;
     }
 
