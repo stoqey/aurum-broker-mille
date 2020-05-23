@@ -1,7 +1,7 @@
 import 'mocha';
 import { MilleBroker } from '.';
 
-const milleBroker = new MilleBroker();
+const milleBroker = new MilleBroker(new Date("2020-03-10 09:30:00"));
 
 before((done) => {
     milleBroker.when('onReady', async () => {

@@ -1,9 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import moment from 'moment';
+import isEmpty from 'lodash/isEmpty';
 import { isTest } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
+import { OrderStock } from '@stoqey/ibkr'
 import FinnhubAPI from '@stoqey/finnhub';
 import { Broker, BrokerAccountSummary, Portfolio, SymbolInfo, GetSymbolData, OpenOrder } from "@stoqey/aurum-broker-spec";
+import { setTimeout } from 'timers';
+
+/**
+ * Init broker state
+ */
+
+const placingOrderDelay = 6000;
+const orderFillingDelay = 5000;
 
 const virtualBrokerState: BrokerAccountSummary = {
     accountId: 'VIRTUAL',
@@ -18,25 +28,26 @@ enum customEvents {
     CREATE_ORDER = 'create_order'
 };
 
-interface Order {
-    symbol: string;
-    type: 'BUY' | 'SELL',
-    position: number; // number of share we want
-    filled: number; // number of shares bought
-}
-
+/**
+ * Mille Broker
+ * 
+ * - Get start from redis
+ */
 export class MilleBroker extends Broker {
     /**
      * Emulated broker account summary
      */
     accountSummary: BrokerAccountSummary = virtualBrokerState;
 
-    portfolios: Portfolio[] = [];
+    portfolios: { [x: string]: Portfolio } = {} as any;
+
+    orders: OrderStock[] = [];
 
     startDate: Date;
 
     milleEvents: MilleEvents;
-    constructor(date?: Date) {
+
+    constructor(date: Date) {
         super();
 
         this.milleEvents = MilleEvents.Instance;
@@ -124,6 +135,48 @@ export class MilleBroker extends Broker {
                 onMarketData(data);
             }
         });
+
+        /**
+         * Order execution/filling
+         * Splice one item from orders, then process it
+         * If exit
+         *  - Remove from portfolio
+         * If not exit
+         *  - Add to portfolio
+         * 
+         * ALL
+         * - Remove from orders list after processing
+         */
+
+        setTimeout(() => {
+
+            if (!isEmpty(self.orders)) {
+
+                const orderToProcess = self.orders.shift();
+                const isExit = orderToProcess && orderToProcess.exitTrade;
+                const { symbol, size } = orderToProcess;
+                if (isExit) {
+                    delete self.portfolios[symbol];
+                    console.log('portfolio delete exit', symbol)
+                }
+                else {
+                    // create new portfolio
+                    const newPortfolio: Portfolio = {
+                        symbol,
+                        position: size,
+                        averageCost: 0,
+                        marketPrice: 0
+                    };
+
+                    self.portfolios[symbol] = newPortfolio;
+                    console.log('portfolio update new', symbol)
+                }
+            } else {
+                console.log('orders are null')
+            }
+
+
+        }, orderFillingDelay)
     }
 
     public searchSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T[]> {
@@ -141,27 +194,74 @@ export class MilleBroker extends Broker {
         return null;
     }
 
-    public getOpenOrders(): Promise<any> {
-        return null;
+    public getOpenOrders<T>(): Promise<any & T[]> {
+        return Promise.resolve(this.orders);
     }
 
 
-    public async getAllPositions(): Promise<any> {
+    public async getAllPositions<T>(): Promise<any & T[]> {
         // Refresh all portfolios and update state to all
-        return this.portfolios;
+        return Object.values(this.portfolios);
     }
 
-    public async enterPosition(portfolio: Portfolio & any): Promise<any> {
-        // setTimeout, 
-        // -> createOrder BUY/SELL
-        // -> emit onOrder
-        // -> fillOrder
-        // -> emit onOrder
-        // -> updatePortfolios
-        return null;
+    /**
+     * Check if symbol exists in current portfolio
+     */
+    private isExistInPortfolio = (symbol): boolean => {
+        return typeof this.portfolios[symbol] !== 'undefined';
     }
 
-    public async exitPosition(portfolio: Portfolio & any): Promise<any> {
+    /**
+     * Check if symbol exists in current open orders
+     */
+    private isExistInOrders = (symbol, action): boolean => {
+        return this.orders.some(order => order.symbol === symbol && order.action === action);
+    }
+
+    public enterPosition = async <T>(order: OrderStock & T): Promise<any> => {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
+        const { symbol, action } = order;
+
+        if (this.isExistInPortfolio(symbol)) {
+            // 
+            return console.log('error portfolio already exist')
+        }
+
+        if (this.isExistInOrders(symbol, action)) {
+            // 
+            return console.log('error order already exist')
+        }
+
+        // Add order to queue
+        setTimeout(() => {
+            self.orders.push(order);
+        }, placingOrderDelay);
+
+        return true;
+    }
+
+    public async exitPosition<T>(order: OrderStock & T): Promise<any> {
+
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
+        const { symbol, action } = order;
+
+        if (!this.isExistInPortfolio(symbol)) {
+            return console.log('error portfolio does not exist')
+        }
+
+        if (this.isExistInOrders(symbol, action)) {
+            return console.log('error order already exist')
+        }
+
+        // Add order to queue
+        setTimeout(() => {
+            self.orders.push(order);
+        }, placingOrderDelay);
+
+        return true;
+
         // setTimeout, 
         // Get if current position exists
         // -> createOrder BUY/SELL for exit
@@ -169,20 +269,6 @@ export class MilleBroker extends Broker {
         // -> fillOrder
         // -> emit onOrder
         // -> updatePortfolios
-        setTimeout(() => {
-            async function exitPosition() {
-                try {
-
-
-
-
-                }
-                catch (error) {
-                    console.log('error exiting position', error);
-                }
-            }
-        }, 2000);
-        return null;
     }
 
     public async getMarketData(args: GetSymbolData): Promise<any> {

@@ -1,10 +1,11 @@
 import { MilleBroker } from '.';
 
-const milleBroker = new MilleBroker();
+const startDate = new Date("2020-03-10 09:30:00");
+const milleBroker = new MilleBroker(startDate);
 
 milleBroker.when('onReady', async () => {
     console.log('on ready');
-    milleBroker.getPriceUpdate("AAPL");
+    milleBroker.getPriceUpdate({ symbol: "AAPL", startDate });
 });
 
 milleBroker.when("onPriceUpdate", async (data: any) => {

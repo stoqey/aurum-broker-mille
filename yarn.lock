@@ -62,6 +62,30 @@
     moment-business-time "^1.0.0"
     ws "^7.2.5"
 
+"@stoqey/ib@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@stoqey/ib/-/ib-0.0.2.tgz#3b1b904b68a0e875dd462ed755a6d2e3db5fed1a"
+  integrity sha512-s6zhAoRhShzfkWMA3JY4ieSaoCyBaTXovTKiEJx2VTt0AiXnLagmOq++RUuYrFyTq4CkdcduSpb/k4xitSAhWg==
+  dependencies:
+    chalk "^4.0.0"
+    command-buffer "^0.1.0"
+    dotenv "^8.2.0"
+    function-rate-limit "^1.1.0"
+    lodash "^4.17.15"
+    moment "^2.24.0"
+
+"@stoqey/ibkr@^1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@stoqey/ibkr/-/ibkr-1.1.8.tgz#a04552ca8d129b18e6034925b37b795754ee9449"
+  integrity sha512-fIBkd1/nikzEDM0X4qXzLZkpktop6x0Lub/UmVCKW5IIW4HA7CTnZRTzx721zaXUz3Ujm7ku7IYr1WbNOKgYLg==
+  dependencies:
+    "@stoqey/ib" "^0.0.2"
+    "@stoqey/timeout-manager" "^0.0.2"
+    debug "^4.1.1"
+    dotenv "^8.2.0"
+    lodash "^4.17.15"
+    moment "^2.24.0"
+
 "@stoqey/mille@^0.0.3":
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/@stoqey/mille/-/mille-0.0.3.tgz#977e740e24474ab64171295439c303f1b05c0e7b"
@@ -70,6 +94,11 @@
     "@stoqey/finnhub" "^0.0.3"
     dotenv "^8.2.0"
     lodash "^4.17.15"
+
+"@stoqey/timeout-manager@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@stoqey/timeout-manager/-/timeout-manager-0.0.2.tgz#af39dc509a7cdb6d6edf4be920adb0c2d760a7a1"
+  integrity sha512-/uRZ9osIf+yNq2nq/OcpH6A/h9Lva8HZ5KcDPiXhjAkwX+uQcRHq3GBQG/BHRPekdjvWzfpPnOVEdAJ+XiYALQ==
 
 "@types/chai@^4.2.11":
   version "4.2.11"
@@ -670,6 +699,11 @@ color-name@~1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
+
+command-buffer@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/command-buffer/-/command-buffer-0.1.0.tgz#ced3f40f77289314db91cb77ef3b00c332e8e268"
+  integrity sha1-ztP0D3cokxTbkct37zsAwzLo4mg=
 
 commander@^5.0.0:
   version "5.1.0"
@@ -1361,6 +1395,11 @@ function-bind@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
   integrity sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==
+
+function-rate-limit@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/function-rate-limit/-/function-rate-limit-1.1.0.tgz#eccdf1af918fc959eb6509058603e462e37fd683"
+  integrity sha1-7M3xr5GPyVnrZQkFhgPkYuN/1oM=
 
 functional-red-black-tree@^1.0.1:
   version "1.0.1"
