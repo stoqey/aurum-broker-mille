@@ -25,7 +25,8 @@ enum customEvents {
     GET_MARKET_DATA = 'get_market_data',
     ADD_PORTFOLIO = 'add_portfolio',
     ON_PORTFOLIO = 'on_portfolio',
-    CREATE_ORDER = 'create_order'
+    CREATE_ORDER = 'create_order',
+    ON_ORDER = 'on_order'
 };
 
 /**
@@ -136,6 +137,30 @@ export class MilleBroker extends Broker {
             }
         });
 
+
+        // For orders and portfolios
+        /**
+         * On portfolios data received
+         */
+        milleEvents.on(customEvents.ON_PORTFOLIO, (data) => {
+            const onPortfolios = self.events["onPortfolios"];
+
+            if (onPortfolios) {
+                onPortfolios(data);
+            }
+        });
+
+        /**
+         * On market data received
+         */
+        milleEvents.on(customEvents.ON_ORDER, (data) => {
+            const onOrders = self.events["onOrders"];
+
+            if (onOrders) {
+                onOrders(data);
+            }
+        });
+
         /**
          * Order execution/filling
          * Splice one item from orders, then process it
@@ -153,9 +178,9 @@ export class MilleBroker extends Broker {
             if (!isEmpty(self.orders)) {
 
                 const orderToProcess = self.orders.shift();
-                const isExit = orderToProcess && orderToProcess.exitTrade;
-                const { symbol, size } = orderToProcess;
-                if (isExit) {
+                const { symbol, size, exitTrade } = orderToProcess;
+
+                if (exitTrade) {
                     delete self.portfolios[symbol];
                     console.log('portfolio delete exit', symbol)
                 }
@@ -171,11 +196,15 @@ export class MilleBroker extends Broker {
                     self.portfolios[symbol] = newPortfolio;
                     console.log('portfolio update new', symbol)
                 }
+
+                const currentPortfolios = self.getAllPositions();
+
+                // emit update portfolios
+                milleEvents.emit(customEvents.ON_PORTFOLIO, currentPortfolios);
+
             } else {
                 console.log('orders are null')
             }
-
-
         }, orderFillingDelay)
     }
 
@@ -194,12 +223,12 @@ export class MilleBroker extends Broker {
         return null;
     }
 
-    public getOpenOrders<T>(): Promise<any & T[]> {
+    public getOpenOrders = <T>(): Promise<any & T[]> => {
         return Promise.resolve(this.orders);
     }
 
 
-    public async getAllPositions<T>(): Promise<any & T[]> {
+    public getAllPositions = async <T>(): Promise<any & T[]> => {
         // Refresh all portfolios and update state to all
         return Object.values(this.portfolios);
     }
@@ -216,6 +245,11 @@ export class MilleBroker extends Broker {
      */
     private isExistInOrders = (symbol, action): boolean => {
         return this.orders.some(order => order.symbol === symbol && order.action === action);
+    }
+
+    private placeOrder = (order: OrderStock) => {
+        this.orders.push(order);
+        this.milleEvents.emit(customEvents.ON_ORDER, [order]);
     }
 
     public enterPosition = async <T>(order: OrderStock & T): Promise<any> => {
@@ -235,13 +269,13 @@ export class MilleBroker extends Broker {
 
         // Add order to queue
         setTimeout(() => {
-            self.orders.push(order);
+            self.placeOrder(order);
         }, placingOrderDelay);
 
         return true;
     }
 
-    public async exitPosition<T>(order: OrderStock & T): Promise<any> {
+    public exitPosition = async <T>(order: OrderStock & T): Promise<any> => {
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
@@ -257,7 +291,7 @@ export class MilleBroker extends Broker {
 
         // Add order to queue
         setTimeout(() => {
-            self.orders.push(order);
+            self.placeOrder(order);
         }, placingOrderDelay);
 
         return true;
@@ -271,7 +305,7 @@ export class MilleBroker extends Broker {
         // -> updatePortfolios
     }
 
-    public async getMarketData(args: GetSymbolData): Promise<any> {
+    public getMarketData = async (args: GetSymbolData): Promise<any> => {
         const { symbol, startDate, endDate } = args;
         this.milleEvents.emit(customEvents.GET_MARKET_DATA, { symbol, startDate, endDate });
         // Can use finnhub
@@ -279,7 +313,7 @@ export class MilleBroker extends Broker {
     }
 
     // Complete
-    public async getPriceUpdate(args: GetSymbolData): Promise<any> {
+    public getPriceUpdate = async (args: GetSymbolData): Promise<any> => {
         const { symbol, startDate, endDate } = args;
         this.milleEvents.emit(MILLEEVENTS.GET_DATA, [symbol]);
         return symbol;
