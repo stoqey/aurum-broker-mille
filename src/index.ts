@@ -12,8 +12,8 @@ import { setTimeout } from 'timers';
  * Init broker state
  */
 
-const placingOrderDelay = 6000;
-const orderFillingDelay = 5000;
+const placingOrderDelay = 3000;
+const orderFillingDelay = 1000;
 
 const virtualBrokerState: BrokerAccountSummary = {
     accountId: 'VIRTUAL',
@@ -173,7 +173,7 @@ export class MilleBroker extends Broker {
          * - Remove from orders list after processing
          */
 
-        setTimeout(() => {
+        setInterval(async () => {
 
             if (!isEmpty(self.orders)) {
 
@@ -194,16 +194,14 @@ export class MilleBroker extends Broker {
                     };
 
                     self.portfolios[symbol] = newPortfolio;
-                    console.log('portfolio update new', symbol)
+                    console.log('portfolio update new', Object.keys(self.portfolios))
                 }
 
-                const currentPortfolios = self.getAllPositions();
+                const currentPortfolios = await self.getAllPositions();
 
                 // emit update portfolios
                 milleEvents.emit(customEvents.ON_PORTFOLIO, currentPortfolios);
 
-            } else {
-                console.log('orders are null')
             }
         }, orderFillingDelay)
     }
@@ -269,6 +267,7 @@ export class MilleBroker extends Broker {
 
         // Add order to queue
         setTimeout(() => {
+            console.log('placing order', `symbol=${symbol}, action=${action}`)
             self.placeOrder(order);
         }, placingOrderDelay);
 

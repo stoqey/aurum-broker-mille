@@ -1,37 +1,78 @@
 import 'mocha';
 import { MilleBroker } from '.';
+import { OrderStock } from '@stoqey/ibkr';
+import { Portfolio } from '@stoqey/aurum-broker-spec';
 
-const milleBroker = new MilleBroker(new Date("2020-03-10 09:30:00"));
+const broker = new MilleBroker(new Date("2020-03-10 09:30:00"));
 
 before((done) => {
-    milleBroker.when('onReady', async () => {
+    broker.when('onReady', async () => {
         console.log('on ready');
         done();
     });
+    broker.init();
 });
 
 describe('Mille broker', () => {
 
     it(`Price updates`, (done) => {
-
-        milleBroker.when("onPriceUpdate", async (data: any) => {
-            console.log('on price updates data is', data);
-            done();
+        let completed = false;
+        broker.when("onPriceUpdate", async (data: any) => {
+            if (!completed) {
+                console.log('on price updates data is', data);
+                completed = true;
+                done();
+            }
         });
 
-        milleBroker.getPriceUpdate({ symbol: "AAPL", startDate: null });
+        broker.getPriceUpdate({ symbol: "AAPL", startDate: null });
     })
 
     it(`MarketData`, (done) => {
-
+        let completed = false;
         const startDate = new Date("2020-03-10 09:30:00");
         const endDate = new Date("2020-03-13 09:30:00");
 
-        milleBroker.when("onMarketData", async ({ marketData = [], symbol }) => {
-            console.log('got market data' + symbol, marketData.length);
-            done();
+        broker.when("onMarketData", async ({ marketData = [], symbol }) => {
+            if (!completed) {
+                console.log('got market data' + symbol, marketData.length);
+                completed = true;
+                done();
+            }
         });
 
-        milleBroker.getMarketData({ symbol: "AAPL", startDate, endDate });
+        broker.getMarketData({ symbol: "AAPL", startDate, endDate });
+    })
+
+    it(`Portfolio`, (done) => {
+        let completed = false;
+        const demoOrder: OrderStock = {
+            symbol: "AAPL",
+            action: "BUY",
+            type: "market",
+            parameters: [],
+            size: 1,
+            exitTrade: false
+        }
+
+        broker.when("onPortfolios", async (portfolios: Portfolio[]) => {
+
+            console.log('portfolios', JSON.stringify(portfolios));
+            console.log('got portfolios', portfolios && portfolios.length);
+
+            const portfolioCreated = portfolios.some(port => port.symbol === demoOrder.symbol);
+
+            if (!completed) {
+                console.log('got portfolios !completed', portfolios && portfolios.length);
+                if (portfolioCreated) {
+                    completed = true;
+                    done();
+                }
+            }
+
+
+        });
+
+        broker.enterPosition(demoOrder)
     })
 })
