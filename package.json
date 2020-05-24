@@ -1,6 +1,6 @@
 {
   "name": "@stoqey/aurum-broker-mille",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": false,
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -28,7 +28,7 @@
   "dependencies": {
     "@stoqey/aurum-broker-spec": "^0.0.8",
     "@stoqey/finnhub": "^0.0.7",
-    "@stoqey/mille": "^0.0.3",
+    "@stoqey/mille": "^0.0.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "redis-messaging-manager": "^1.6.2"

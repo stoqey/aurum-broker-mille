@@ -86,12 +86,13 @@
     lodash "^4.17.15"
     moment "^2.24.0"
 
-"@stoqey/mille@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@stoqey/mille/-/mille-0.0.3.tgz#977e740e24474ab64171295439c303f1b05c0e7b"
-  integrity sha512-iG990tAH06LzOHjYN4ui2P8hFpNrgxibptuQ4SVieQHkH2qKrMkbXCBkGnyE+eGP2SrYy6s9r++fLRWuJTKA9A==
+"@stoqey/mille@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@stoqey/mille/-/mille-0.0.4.tgz#457e8f9ed55a96bcae7bf51479085e936ce8b171"
+  integrity sha512-jpmiRDUypR0wQ1qUXcZvCXdGKZSof4xyQLyNzS08bLOFQl5mt8crmlfr9KW2tIGzkkbT7ynxB7c8tdKb3fHBIQ==
   dependencies:
     "@stoqey/finnhub" "^0.0.3"
+    debug "^4.1.1"
     dotenv "^8.2.0"
     lodash "^4.17.15"
 

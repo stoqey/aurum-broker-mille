@@ -130,7 +130,7 @@ export class MilleBroker extends Broker {
                  * use startDate as end @aka to
                  * use endDate as start @aka from
                  */
-                const data = await finnhub.getCandles(symbol, endDate, startDate, range as Resolution);
+                const data = await finnhub.getCandles(symbol, startDate, endDate, range as Resolution);
                 milleEvents.emit(customEvents.ON_MARKET_DATA, { symbol, marketData: data });
             }
             getData();
