@@ -4,6 +4,9 @@
   "private": false,
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "files": [
+    "build/"
+  ],
   "scripts": {
     "dev": "nodemon src/index.ts",
     "start": "node build/index.js",
