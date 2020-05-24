@@ -34,6 +34,7 @@ enum customEvents {
  * - Get start from redis
  */
 export class MilleBroker extends Broker {
+
     /**
      * Emulated broker account summary
      */
@@ -214,6 +215,10 @@ export class MilleBroker extends Broker {
     }
     public quoteSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T> {
         throw new Error("Method not implemented.");
+    }
+
+    public getScreener(): <T>(args: any) => Promise<any & T[]> {
+        return null;
     }
 
     async getAccountSummary(): Promise<BrokerAccountSummary> {
