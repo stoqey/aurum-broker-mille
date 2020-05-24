@@ -16,7 +16,7 @@ const HOSTNAME = os.hostname();
  * @param   app: express.Application; 
  * @param   broker: MilleBroker;
  */
-export const brokerHttpServer = (args: Args): express.Application => {
+export const milleBrokerServer = (args: Args): express.Application => {
 
     const { app, broker } = args;
 
