@@ -21,7 +21,8 @@
   },
   "exclude": [
     "build",
-    "node_modules"
+    "*/**/*test.ts",
+    "node_modules",
   ],
   "include": [
     "src/**/*"
