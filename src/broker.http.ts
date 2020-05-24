@@ -1,7 +1,7 @@
 import express from 'express';
 import os from 'os';
 import { log, verbose } from './log';
-import MilleBroker from '.';
+import MilleBroker from './MilleBroker';
 
 interface Args {
     app: express.Application;

@@ -6,8 +6,7 @@ import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
 import { OrderStock } from '@stoqey/ibkr'
 import FinnhubAPI from '@stoqey/finnhub';
 import { Broker, BrokerAccountSummary, Portfolio, SymbolInfo, GetSymbolData, OpenOrder } from "@stoqey/aurum-broker-spec";
-import { setTimeout } from 'timers';
-
+import { log } from './log';
 /**
  * Init broker state
  */
@@ -182,7 +181,7 @@ export class MilleBroker extends Broker {
 
                 if (exitTrade) {
                     delete self.portfolios[symbol];
-                    console.log('portfolio delete exit', symbol)
+                    log('portfolio delete exit', symbol)
                 }
                 else {
                     // create new portfolio
@@ -194,7 +193,7 @@ export class MilleBroker extends Broker {
                     };
 
                     self.portfolios[symbol] = newPortfolio;
-                    console.log('portfolio update new', Object.keys(self.portfolios))
+                    log('portfolio update new', Object.keys(self.portfolios))
                 }
 
                 const currentPortfolios = await self.getAllPositions();
@@ -257,17 +256,17 @@ export class MilleBroker extends Broker {
 
         if (this.isExistInPortfolio(symbol)) {
             // 
-            return console.log('error portfolio already exist')
+            return log('error portfolio already exist')
         }
 
         if (this.isExistInOrders(symbol, action)) {
             // 
-            return console.log('error order already exist')
+            return log('error order already exist')
         }
 
         // Add order to queue
         setTimeout(() => {
-            console.log('placing order', `symbol=${symbol}, action=${action}`)
+            log('placing order', `symbol=${symbol}, action=${action}`)
             self.placeOrder(order);
         }, placingOrderDelay);
 
@@ -281,11 +280,11 @@ export class MilleBroker extends Broker {
         const { symbol, action } = order;
 
         if (!this.isExistInPortfolio(symbol)) {
-            return console.log('error portfolio does not exist')
+            return log('error portfolio does not exist')
         }
 
         if (this.isExistInOrders(symbol, action)) {
-            return console.log('error order already exist')
+            return log('error order already exist')
         }
 
         // Add order to queue
