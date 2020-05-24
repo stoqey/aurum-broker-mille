@@ -313,7 +313,11 @@ export class MilleBroker extends Broker {
     }
 
     public getMarketData = async (args: GetSymbolData): Promise<any> => {
-        const { symbol, startDate, endDate } = args;
+        const { symbol, startDate } = args;
+
+        const cloneStartDate = startDate;
+        const endDate = args.endDate || new Date(cloneStartDate.setDate(startDate.getDate() - 1));
+
         this.milleEvents.emit(customEvents.GET_MARKET_DATA, { symbol, startDate, endDate });
         // Can use finnhub
         return null;
