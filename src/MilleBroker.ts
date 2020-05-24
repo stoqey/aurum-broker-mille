@@ -110,13 +110,11 @@ export class MilleBroker extends Broker {
          * Register all events here
          */
         milleEvents.on(MILLEEVENTS.DATA, (data) => {
-
             const onPriceUpdates = self.events["onPriceUpdate"];
-
+            const { symbol, tick } = data;
             if (onPriceUpdates) {
-                onPriceUpdates(data);
+                onPriceUpdates({ symbol, ...tick }); // price, volume, date
             }
-
         });
 
 
@@ -139,7 +137,7 @@ export class MilleBroker extends Broker {
         /**
          * Get market data
          */
-        milleEvents.on(customEvents.GET_MARKET_DATA, throttle(handleGetMarketData, 1000));
+        milleEvents.on(customEvents.GET_MARKET_DATA, handleGetMarketData);
 
         /**
          * On market data received
@@ -151,7 +149,6 @@ export class MilleBroker extends Broker {
                 onMarketData(data);
             }
         });
-
 
         // For orders and portfolios
         /**
