@@ -20,10 +20,10 @@ A broker implementation for aurum using <a href="https://github.com/stoqey/mille
 | ----------------- | -------- |
 | init              | ✅        |
 | getAccountSummary | ✅        |
-| getOpenOrders     | ❌        |
-| getAllPositions   | ❌        |
-| enterPosition     | ❌        |
-| exitPosition      | ❌        |
+| getOpenOrders     | ✅        |
+| getAllPositions   | ✅        |
+| enterPosition     | ✅        |
+| exitPosition      | ✅        |
 | searchSymbol      | ❌        |
 | quoteSymbol       | ❌        |
 | getMarketData     | ✅        |
@@ -33,10 +33,10 @@ A broker implementation for aurum using <a href="https://github.com/stoqey/mille
 | Method        | Progress |
 | ------------- | -------- |
 | onReady       | ✅        |
-| onPortfolios  | ❌        |
-| onOrder       | ❌        |
-| onMarketData  | ❌        |
-| onPriceUpdate | ❌        |
+| onPortfolios  | ✅        |
+| onOrder       | ✅        |
+| onMarketData  | ✅        |
+| onPriceUpdate | ✅        |
 
 
 ### Installation
@@ -49,7 +49,7 @@ npm i @stoqey/aurum-broker-ibkr
 ```ts
 import { MilleBroker } from '@stoqey/aurum-broker-mille';
 
-const broker = new MilleBroker();
+const broker = new MilleBroker(new Date("2020-03-10 09:30:00"));
 
 // register events
 broker.when('onReady', async () => {

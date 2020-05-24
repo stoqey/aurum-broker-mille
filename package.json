@@ -33,6 +33,7 @@
     "redis-messaging-manager": "^1.6.2"
   },
   "devDependencies": {
+    "@stoqey/ibkr": "^1.1.8",
     "@types/chai": "^4.2.11",
     "@types/dotenv": "^8.2.0",
     "@types/ioredis": "^4.16.0",
