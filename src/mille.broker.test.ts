@@ -2,12 +2,13 @@ import 'mocha';
 import { MilleBroker } from '.';
 import { OrderStock } from '@stoqey/ibkr';
 import { Portfolio } from '@stoqey/aurum-broker-spec';
+import { log } from './log';
 
 const broker = new MilleBroker(new Date("2020-03-10 09:30:00"));
 
 before((done) => {
     broker.when('onReady', async () => {
-        console.log('on ready');
+        log('on ready');
         done();
     });
     broker.init();
@@ -29,7 +30,7 @@ describe('Mille broker', () => {
         let completed = false;
         broker.when("onPriceUpdate", async (data: any) => {
             if (!completed) {
-                console.log('on price updates data is', data);
+                log('on price updates data is', data);
                 completed = true;
                 done();
             }
@@ -45,7 +46,7 @@ describe('Mille broker', () => {
 
         broker.when("onMarketData", async ({ marketData = [], symbol }) => {
             if (!completed) {
-                console.log('got market data' + symbol, marketData.length);
+                log('got market data' + symbol, marketData.length);
                 completed = true;
                 done();
             }
@@ -58,13 +59,13 @@ describe('Mille broker', () => {
         let completed = false;
         broker.when("onPortfolios", async (portfolios: Portfolio[]) => {
 
-            console.log('portfolios', JSON.stringify(portfolios));
-            console.log('got portfolios', portfolios && portfolios.length);
+            log('portfolios', JSON.stringify(portfolios));
+            log('got portfolios', portfolios && portfolios.length);
 
             const portfolioCreated = portfolios.some(port => port.symbol === demoOrder.symbol);
 
             if (!completed) {
-                console.log('got portfolios !completed', portfolios && portfolios.length);
+                log('got portfolios !completed', portfolios && portfolios.length);
                 if (portfolioCreated) {
                     completed = true;
                     done();
@@ -84,13 +85,13 @@ describe('Mille broker', () => {
 
         broker.when("onPortfolios", async (portfolios: Portfolio[]) => {
 
-            console.log('portfolios', JSON.stringify(portfolios));
-            console.log('got portfolios', portfolios && portfolios.length);
+            log('portfolios', JSON.stringify(portfolios));
+            log('got portfolios', portfolios && portfolios.length);
 
             const portfolioExists = portfolios.some(port => port.symbol === demoOrder.symbol);
 
             if (!completed) {
-                console.log('got portfolios !completed', portfolios && portfolios.length);
+                log('got portfolios !completed', portfolios && portfolios.length);
                 if (!portfolioExists) {
                     completed = true;
                     done();
