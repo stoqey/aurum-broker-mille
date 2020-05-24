@@ -47,12 +47,16 @@ export class MilleBroker extends Broker {
 
     milleEvents: MilleEvents;
 
-    constructor(date: Date) {
+    constructor(date: Date, state?: BrokerAccountSummary) {
         super();
 
         this.milleEvents = MilleEvents.Instance;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
+
+        if (state) {
+            this.accountSummary = state;
+        };
 
         this.startDate = date;
 
