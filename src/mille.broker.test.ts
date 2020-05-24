@@ -13,6 +13,16 @@ before((done) => {
     broker.init();
 });
 
+const demoOrder: OrderStock = {
+    symbol: "AAPL",
+    action: "BUY",
+    type: "market",
+    parameters: [],
+    size: 1,
+    exitTrade: false
+}
+
+
 describe('Mille broker', () => {
 
     it(`Price updates`, (done) => {
@@ -44,17 +54,8 @@ describe('Mille broker', () => {
         broker.getMarketData({ symbol: "AAPL", startDate, endDate });
     })
 
-    it(`Portfolio`, (done) => {
+    it(`Buy Portfolio`, (done) => {
         let completed = false;
-        const demoOrder: OrderStock = {
-            symbol: "AAPL",
-            action: "BUY",
-            type: "market",
-            parameters: [],
-            size: 1,
-            exitTrade: false
-        }
-
         broker.when("onPortfolios", async (portfolios: Portfolio[]) => {
 
             console.log('portfolios', JSON.stringify(portfolios));
@@ -74,5 +75,30 @@ describe('Mille broker', () => {
         });
 
         broker.enterPosition(demoOrder)
+    })
+
+    it(`Sell Portfolio`, (done) => {
+        let completed = false;
+        demoOrder.exitTrade = true;
+        demoOrder.action = "SELL";
+
+        broker.when("onPortfolios", async (portfolios: Portfolio[]) => {
+
+            console.log('portfolios', JSON.stringify(portfolios));
+            console.log('got portfolios', portfolios && portfolios.length);
+
+            const portfolioExists = portfolios.some(port => port.symbol === demoOrder.symbol);
+
+            if (!completed) {
+                console.log('got portfolios !completed', portfolios && portfolios.length);
+                if (!portfolioExists) {
+                    completed = true;
+                    done();
+                }
+            }
+
+        });
+
+        broker.exitPosition(demoOrder)
     })
 })

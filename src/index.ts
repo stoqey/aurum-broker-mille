@@ -218,7 +218,7 @@ export class MilleBroker extends Broker {
     }
 
     public getAllOrders(): Promise<any> {
-        return null;
+        return this.getOpenOrders();
     }
 
     public getOpenOrders = <T>(): Promise<any & T[]> => {
