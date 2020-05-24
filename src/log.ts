@@ -1,6 +1,6 @@
 import debug from 'debug';
 
-const libraryPrefix = 'broker';
+const libraryPrefix = 'aurum-broker-mille';
 
 /**
  * Use to log in general case
