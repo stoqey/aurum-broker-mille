@@ -1,6 +1,6 @@
 {
   "name": "@stoqey/aurum-broker-mille",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": false,
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -10,7 +10,7 @@
     "build": "rm -rf build && tsc",
     "test": "NODE_ENV=test mocha src/*test.ts --exit",
     "redis": "NODE_ENV=test mocha src/redis/*test.ts --exit",
-    "eslint": "eslint src --fix --ext=ts",
+    "eslint": "eslint src --fix --ext=ts --ignore-pattern=*.test.ts",
     "local": "yarn build && yarn link",
     "prepare": "yarn build",
     "prepublishOnly": "yarn test"
@@ -26,10 +26,11 @@
     }
   },
   "dependencies": {
-    "@stoqey/aurum-broker-spec": "^0.0.7",
+    "@stoqey/aurum-broker-spec": "^0.0.8",
     "@stoqey/finnhub": "^0.0.7",
     "@stoqey/mille": "^0.0.3",
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "redis-messaging-manager": "^1.6.2"
   },
   "devDependencies": {

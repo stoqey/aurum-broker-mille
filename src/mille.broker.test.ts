@@ -55,6 +55,22 @@ describe('Mille broker', () => {
         broker.getMarketData({ symbol: "AAPL", startDate, endDate });
     })
 
+    it(`MarketData withoutEndDate`, (done) => {
+        let completed = false;
+        const startDate = new Date("2020-03-10 09:30:00");
+        // const endDate = new Date("2020-03-13 09:30:00");
+
+        broker.when("onMarketData", async ({ marketData = [], symbol }) => {
+            if (!completed) {
+                log('got market data' + symbol, marketData.length);
+                completed = true;
+                done();
+            }
+        });
+
+        broker.getMarketData({ symbol: "AAPL", startDate });
+    })
+
     it(`Buy Portfolio`, (done) => {
         let completed = false;
         broker.when("onPortfolios", async (portfolios: Portfolio[]) => {

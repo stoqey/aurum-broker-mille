@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import moment from 'moment';
 import isEmpty from 'lodash/isEmpty';
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 import { isTest } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
 import { OrderStock } from '@stoqey/ibkr'
-import FinnhubAPI from '@stoqey/finnhub';
+import FinnhubAPI, { Resolution } from '@stoqey/finnhub';
 import { Broker, BrokerAccountSummary, Portfolio, SymbolInfo, GetSymbolData, OpenOrder } from "@stoqey/aurum-broker-spec";
-import { log } from './log';
+import { log, verbose } from './log';
 /**
  * Init broker state
  */
@@ -34,6 +36,7 @@ enum customEvents {
  * - Get start from redis
  */
 export class MilleBroker extends Broker {
+
     /**
      * Emulated broker account summary
      */
@@ -116,18 +119,27 @@ export class MilleBroker extends Broker {
 
         });
 
-        /**
-         * Get market data
-         */
-        milleEvents.on(customEvents.GET_MARKET_DATA, ({ symbol, startDate, endDate, range }) => {
+
+        const handleGetMarketData = ({ symbol, startDate, endDate, range = '1' }) => {
             const finnhub = new FinnhubAPI(process.env.FINNHUB_KEY);
 
             async function getData() {
-                const data = await finnhub.getCandles(symbol, startDate, endDate, range || '1');
+                console.log(`symbol=${symbol} startDate=${startDate} endDate=${endDate} range=${range}`);
+
+                /**
+                 * use startDate as end @aka to
+                 * use endDate as start @aka from
+                 */
+                const data = await finnhub.getCandles(symbol, endDate, startDate, range as Resolution);
                 milleEvents.emit(customEvents.ON_MARKET_DATA, { symbol, marketData: data });
             }
             getData();
-        });
+        };
+
+        /**
+         * Get market data
+         */
+        milleEvents.on(customEvents.GET_MARKET_DATA, throttle(handleGetMarketData, 1000));
 
         /**
          * On market data received
@@ -214,6 +226,10 @@ export class MilleBroker extends Broker {
     }
     public quoteSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T> {
         throw new Error("Method not implemented.");
+    }
+
+    public getScreener(): <T>(args: any) => Promise<any & T[]> {
+        return null;
     }
 
     async getAccountSummary(): Promise<BrokerAccountSummary> {
@@ -308,7 +324,11 @@ export class MilleBroker extends Broker {
     }
 
     public getMarketData = async (args: GetSymbolData): Promise<any> => {
-        const { symbol, startDate, endDate } = args;
+        const { symbol, startDate } = args;
+
+        const cloneStartDate = new Date(startDate);
+        const endDate = new Date(args.endDate || cloneStartDate.setDate(cloneStartDate.getDate() - 1));
+
         this.milleEvents.emit(customEvents.GET_MARKET_DATA, { symbol, startDate, endDate });
         // Can use finnhub
         return null;
