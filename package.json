@@ -36,6 +36,7 @@
     "@stoqey/ibkr": "^1.1.8",
     "@types/chai": "^4.2.11",
     "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.6",
     "@types/ioredis": "^4.16.0",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^7.0.2",
