@@ -3,7 +3,7 @@ import moment from 'moment';
 import isEmpty from 'lodash/isEmpty';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
-import { isTest } from "./config";
+import { isTest, CustomBrokerEvents as customEvents } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
 import { OrderStock } from '@stoqey/ibkr'
 import FinnhubAPI, { Resolution } from '@stoqey/finnhub';
@@ -21,14 +21,6 @@ const virtualBrokerState: BrokerAccountSummary = {
     totalCashValue: 3000,
 };
 
-enum customEvents {
-    ON_MARKET_DATA = 'on_market_data',
-    GET_MARKET_DATA = 'get_market_data',
-    ADD_PORTFOLIO = 'add_portfolio',
-    ON_PORTFOLIO = 'on_portfolio',
-    CREATE_ORDER = 'create_order',
-    ON_ORDER = 'on_order'
-};
 
 /**
  * Mille Broker
@@ -110,25 +102,31 @@ export class MilleBroker extends Broker {
          * Register all events here
          */
         milleEvents.on(MILLEEVENTS.DATA, (data) => {
-            const onPriceUpdates = self.events["onPriceUpdate"];
-            const { symbol, tick } = data;
-            if (onPriceUpdates) {
-                onPriceUpdates({ symbol, ...tick }); // price, volume, date
-            }
+            // const onPriceUpdates = self.events["onPriceUpdate"];
+            // const { symbol, tick } = data;
+            // if (onPriceUpdates) {
+            //     onPriceUpdates({ symbol, ...tick }); // price, volume, date
+            // }
         });
 
 
+        /**
+         * HandleGetMarketData request
+         * @param param0 
+         */
         const handleGetMarketData = ({ symbol, startDate, endDate, range = '1' }) => {
             const finnhub = new FinnhubAPI(process.env.FINNHUB_KEY);
 
             async function getData() {
-                log(`symbol=${symbol} startDate=${startDate} endDate=${endDate} range=${range}`);
+                verbose(`handleGetMarketData symbol=${symbol}`, `startDate=${startDate} endDate=${endDate} range=${range}`);
 
                 /**
                  * use startDate as end @aka to
                  * use endDate as start @aka from
                  */
                 const data = await finnhub.getCandles(symbol, startDate, endDate, range as Resolution);
+
+                // TODO save save to redis
                 milleEvents.emit(customEvents.ON_MARKET_DATA, { symbol, marketData: data });
             }
             getData();
@@ -143,11 +141,11 @@ export class MilleBroker extends Broker {
          * On market data received
          */
         milleEvents.on(customEvents.ON_MARKET_DATA, (data) => {
-            const onMarketData = self.events["onMarketData"];
+            // const onMarketData = self.events["onMarketData"];
 
-            if (onMarketData) {
-                onMarketData(data);
-            }
+            // if (onMarketData) {
+            //     onMarketData(data);
+            // }
         });
 
         // For orders and portfolios
@@ -155,11 +153,11 @@ export class MilleBroker extends Broker {
          * On portfolios data received
          */
         milleEvents.on(customEvents.ON_PORTFOLIO, (data) => {
-            const onPortfolios = self.events["onPortfolios"];
+            // const onPortfolios = self.events["onPortfolios"];
 
-            if (onPortfolios) {
-                onPortfolios(data);
-            }
+            // if (onPortfolios) {
+            //     onPortfolios(data);
+            // }
         });
 
         /**
