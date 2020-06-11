@@ -122,7 +122,7 @@ export class MilleBroker extends Broker {
             const finnhub = new FinnhubAPI(process.env.FINNHUB_KEY);
 
             async function getData() {
-                console.log(`symbol=${symbol} startDate=${startDate} endDate=${endDate} range=${range}`);
+                log(`symbol=${symbol} startDate=${startDate} endDate=${endDate} range=${range}`);
 
                 /**
                  * use startDate as end @aka to
