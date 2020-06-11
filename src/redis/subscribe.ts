@@ -50,3 +50,9 @@ export const redisSubscribe = (milleBroker: MilleBroker) => {
         log("MILLEEVENTS.TIME_TICK", + data)
     });
 }
+
+export const publishDataToRedisChannel = (channel: string, data) => {
+    const redisPubSubClient = new redisPubSub(redisConfig);
+    redisPubSubClient.emit(channel, { data });
+}
+

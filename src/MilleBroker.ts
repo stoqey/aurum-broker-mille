@@ -3,12 +3,13 @@ import moment from 'moment';
 import isEmpty from 'lodash/isEmpty';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
-import { isTest, CustomBrokerEvents as customEvents } from "./config";
+import { isTest, CustomBrokerEvents as customEvents, RedisChannels } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
 import { OrderStock } from '@stoqey/ibkr'
 import FinnhubAPI, { Resolution } from '@stoqey/finnhub';
 import { Broker, BrokerAccountSummary, Portfolio, SymbolInfo, GetSymbolData, OpenOrder } from "@stoqey/aurum-broker-spec";
 import { log, verbose } from './log';
+import { publishDataToRedisChannel, redisSubscribe } from './redis/subscribe'
 /**
  * Init broker state
  */
@@ -42,7 +43,7 @@ export class MilleBroker extends Broker {
 
     milleEvents: MilleEvents;
 
-    constructor(date: Date, state?: BrokerAccountSummary) {
+    constructor(date: Date, state?: BrokerAccountSummary, write?: boolean) {
         super();
 
         this.milleEvents = MilleEvents.Instance;
@@ -56,7 +57,9 @@ export class MilleBroker extends Broker {
         this.startDate = date;
 
         // init all listeners
-        this.init();
+        redisSubscribe(this);
+
+        this.init(write);
 
 
         if (isTest) {
@@ -90,23 +93,24 @@ export class MilleBroker extends Broker {
     /**
      * init
      */
-    public init() {
+    public init(write: boolean) {
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
         const milleEvents = this.milleEvents;
 
+        const emit = (channel: string, data: any) => {
+            if (write) {
+                publishDataToRedisChannel(channel, data)
+            }
+        }
 
         /**
          * Register all events here
          */
         milleEvents.on(MILLEEVENTS.DATA, (data) => {
-            // const onPriceUpdates = self.events["onPriceUpdate"];
-            // const { symbol, tick } = data;
-            // if (onPriceUpdates) {
-            //     onPriceUpdates({ symbol, ...tick }); // price, volume, date
-            // }
+            emit(MILLEEVENTS.DATA, data)
         });
 
 
@@ -127,7 +131,7 @@ export class MilleBroker extends Broker {
                 const data = await finnhub.getCandles(symbol, startDate, endDate, range as Resolution);
 
                 // TODO save save to redis
-                milleEvents.emit(customEvents.ON_MARKET_DATA, { symbol, marketData: data });
+                emit(customEvents.ON_MARKET_DATA, { symbol, marketData: data });
             }
             getData();
         };
@@ -141,34 +145,21 @@ export class MilleBroker extends Broker {
          * On market data received
          */
         milleEvents.on(customEvents.ON_MARKET_DATA, (data) => {
-            // const onMarketData = self.events["onMarketData"];
-
-            // if (onMarketData) {
-            //     onMarketData(data);
-            // }
+            emit(customEvents.ON_MARKET_DATA, data)
         });
 
-        // For orders and portfolios
         /**
          * On portfolios data received
          */
         milleEvents.on(customEvents.ON_PORTFOLIO, (data) => {
-            // const onPortfolios = self.events["onPortfolios"];
-
-            // if (onPortfolios) {
-            //     onPortfolios(data);
-            // }
+            emit(customEvents.ON_PORTFOLIO, data)
         });
 
         /**
          * On market data received
          */
         milleEvents.on(customEvents.ON_ORDER, (data) => {
-            const onOrders = self.events["onOrders"];
-
-            if (onOrders) {
-                onOrders(data);
-            }
+            emit(customEvents.ON_ORDER, data)
         });
 
         /**
@@ -210,7 +201,7 @@ export class MilleBroker extends Broker {
                 const currentPortfolios = await self.getAllPositions();
 
                 // emit update portfolios
-                milleEvents.emit(customEvents.ON_PORTFOLIO, currentPortfolios);
+                emit(customEvents.ON_PORTFOLIO, currentPortfolios);
 
             }
         }, orderFillingDelay)
