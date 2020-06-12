@@ -65,9 +65,6 @@ export class MilleBroker extends Broker {
 
         this.init();
 
-
-
-
         if (isTest) {
             // fake trade
             setInterval(() => {

@@ -3,11 +3,13 @@ import redisPubSub from 'node-redis-pubsub';
 import { MILLEEVENTS } from '@stoqey/mille'
 import { redisConfig, CustomBrokerEvents } from '../config'
 import MilleBroker from '../MilleBroker';
-import { log } from '../log';
+import { State } from './state';
 
 
 export const redisSubscribe = (milleBroker: MilleBroker) => {
     const redisPubSubClient = new redisPubSub(redisConfig);
+
+    const state = State.Instance;
 
     // on order
     redisPubSubClient.on(CustomBrokerEvents.ON_ORDER, (data) => {
@@ -19,12 +21,16 @@ export const redisSubscribe = (milleBroker: MilleBroker) => {
     });
 
     // on portfolio
-    redisPubSubClient.on(CustomBrokerEvents.ON_PORTFOLIO, (data) => {
-        const onPortfolios = milleBroker.events["onPortfolios"];
+    redisPubSubClient.on(CustomBrokerEvents.ON_PORTFOLIO, async (data) => {
 
-        if (onPortfolios) {
-            onPortfolios(data);
+        const onPortfolios = 'onPortfolios';
+        const onPortfoliosFn = milleBroker.events[onPortfolios];
+
+        if (onPortfoliosFn) {
+            await onPortfoliosFn(data);
         }
+        // SET persist portfolios into redis
+        await state.saveData(onPortfolios, data)
     });
 
     // on market data
@@ -46,8 +52,11 @@ export const redisSubscribe = (milleBroker: MilleBroker) => {
     });
 
     // on time
-    redisPubSubClient.on(MILLEEVENTS.TIME_TICK, function (data) {
-        log("MILLEEVENTS.TIME_TICK", + data)
+    redisPubSubClient.on(MILLEEVENTS.TIME_TICK, async (data) => {
+        // const {  symbols, time }  = data;
+        const market = "market";
+        // SET persist time and symbols into redis
+        await state.saveData(market, data);
     });
 
     return redisPubSubClient;
