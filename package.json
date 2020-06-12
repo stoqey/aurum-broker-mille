@@ -12,6 +12,7 @@
     "start": "node build/index.js",
     "build": "rm -rf build && tsc",
     "test": "NODE_ENV=test mocha src/*test.ts --exit",
+    "trade": "NODE_ENV=test mocha src/trade.test.ts --exit",
     "redis": "NODE_ENV=test mocha src/redis/*test.ts --exit",
     "eslint": "eslint src --fix --ext=ts --ignore-pattern=*.test.ts",
     "local": "yarn build && yarn link",

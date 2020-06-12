@@ -43,6 +43,8 @@ export class MilleBroker extends Broker {
 
     milleEvents: MilleEvents;
 
+    write = false;
+
     constructor(date: Date, state?: BrokerAccountSummary, write?: boolean) {
         super();
 
@@ -56,10 +58,14 @@ export class MilleBroker extends Broker {
 
         this.startDate = date;
 
+        this.write = write || false;
+
         // init all listeners
         redisSubscribe(this);
 
-        this.init(write);
+        this.init();
+
+
 
 
         if (isTest) {
@@ -90,13 +96,21 @@ export class MilleBroker extends Broker {
         const timeAsString = moment(this.startDate).format("DD-MM-YYYY");
         return timeAsString;
     }
+
+    private emit(channel: string, data: any) {
+        if (this.write) {
+            publishDataToRedisChannel(channel, data)
+        }
+    }
     /**
      * init
      */
-    public init(write: boolean) {
+    public init() {
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
+
+        const write = self.write;
 
         const milleEvents = this.milleEvents;
 
@@ -108,6 +122,18 @@ export class MilleBroker extends Broker {
 
         /**
          * Register all events here
+         */
+
+        /**
+         * Time tick
+         */
+        milleEvents.on(MILLEEVENTS.TIME_TICK, (data) => {
+            emit(MILLEEVENTS.TIME_TICK, data)
+        });
+
+
+        /**
+         * Get price update data
          */
         milleEvents.on(MILLEEVENTS.DATA, (data) => {
             emit(MILLEEVENTS.DATA, data)
@@ -162,18 +188,6 @@ export class MilleBroker extends Broker {
             emit(customEvents.ON_ORDER, data)
         });
 
-        /**
-         * Order execution/filling
-         * Splice one item from orders, then process it
-         * If exit
-         *  - Remove from portfolio
-         * If not exit
-         *  - Add to portfolio
-         * 
-         * ALL
-         * - Remove from orders list after processing
-         */
-
         setInterval(async () => {
 
             if (!isEmpty(self.orders)) {
@@ -202,7 +216,6 @@ export class MilleBroker extends Broker {
 
                 // emit update portfolios
                 emit(customEvents.ON_PORTFOLIO, currentPortfolios);
-
             }
         }, orderFillingDelay)
     }
@@ -252,7 +265,7 @@ export class MilleBroker extends Broker {
 
     private placeOrder = (order: OrderStock) => {
         this.orders.push(order);
-        this.milleEvents.emit(customEvents.ON_ORDER, [order]);
+        this.emit(customEvents.ON_ORDER, this.orders);
     }
 
     public enterPosition = async <T>(order: OrderStock & T): Promise<any> => {
