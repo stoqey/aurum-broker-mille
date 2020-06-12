@@ -55,4 +55,23 @@ export class State {
             return res;
         }
     }
+
+
+    /**
+     * getMilleMarketState
+     */
+    public async getMilleMarketState(): Promise<{ time: Date, symbols: string[] }> {
+        try {
+
+            const milleMarket = await this.getData('markets');
+            if (milleMarket && milleMarket.time) {
+                return { time: milleMarket.time, symbols: milleMarket.symbols }
+            }
+
+        }
+        catch (error) {
+            console.log('error getting mille markets', error)
+            return null;
+        }
+    }
 }

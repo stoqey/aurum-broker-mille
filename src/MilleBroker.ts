@@ -10,6 +10,14 @@ import FinnhubAPI, { Resolution } from '@stoqey/finnhub';
 import { Broker, BrokerAccountSummary, Portfolio, SymbolInfo, GetSymbolData, OpenOrder } from "@stoqey/aurum-broker-spec";
 import { log, verbose } from './log';
 import { publishDataToRedisChannel, redisSubscribe } from './redis/subscribe'
+import { State } from './redis/state';
+import { delay } from './promise.utils';
+
+interface OptionsArgs {
+    state?: BrokerAccountSummary;
+    write?: boolean;
+    resume?: boolean;
+}
 /**
  * Init broker state
  */
@@ -45,44 +53,79 @@ export class MilleBroker extends Broker {
 
     write = false;
 
-    constructor(date: Date, state?: BrokerAccountSummary, write?: boolean) {
+    constructor(date: Date, options?: OptionsArgs) {
         super();
 
         this.milleEvents = MilleEvents.Instance;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
+        const redisState = State.Instance;
+
+        const { state = null, write = false, resume = false } = options;
+
         if (state) {
             this.accountSummary = state;
         };
 
-        this.startDate = date;
+        async function startMilleBroker() {
 
-        this.write = write || false;
+            if (resume) {
+                const marketState = await redisState.getMilleMarketState();
 
-        // init all listeners
-        redisSubscribe(this);
+                if (marketState && marketState.time) {
+                    // Get last starting time and set it as start and use previous symbols
+                    this.startDate = marketState.time;
 
-        this.init();
+                    // emit all symbols
+                    setTimeout(async () => {
+                        log('adding all previous symbols');
 
-        if (isTest) {
-            // fake trade
-            setInterval(() => {
-                const onTrade = self.events["onOrder"];
-                onTrade && onTrade({ done: new Date });
-            }, 1000)
+                        const symbols = marketState.symbols;
+
+                        while (symbols.length > 0) {
+                            const symbolX = symbols.shift();
+                            self.getPriceUpdate({ symbol: symbolX, startDate: self.startDate });
+                            await delay(2000, "some string");
+                        }
+
+                    }, 5000);
+                }
+                else {
+                    this.startDate = date;
+                }
+
+
+                this.write = write || false;
+
+                // init all listeners
+                redisSubscribe(this);
+
+                this.init();
+
+                if (isTest) {
+                    // fake trade
+                    setInterval(() => {
+                        const onTrade = self.events["onOrder"];
+                        onTrade && onTrade({ done: new Date });
+                    }, 1000)
+                }
+
+                // Init mille
+                mille({ date, debug: false });
+
+                // start after delay
+                setTimeout(() => {
+                    const onReady = self.events["onReady"];
+                    if (onReady) {
+                        onReady(true);
+                    }
+                }, 2000);
+
+            }
         }
 
-        // Init mille
-        mille({ date, debug: false });
-
-        // start after delay
-        setTimeout(() => {
-            const onReady = self.events["onReady"];
-            if (onReady) {
-                onReady(true);
-            }
-        }, 2000);
+        startMilleBroker();
 
     }
 
