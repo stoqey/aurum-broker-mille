@@ -66,6 +66,6 @@ export const redisSubscribe = (milleBroker: MilleBroker) => {
 
 export const publishDataToRedisChannel = (channel: string, data) => {
     const redisPubSubClient = new redisPubSub(redisConfig);
-    redisPubSubClient.emit(channel, { data });
+    redisPubSubClient.emit(channel, data);
 }
 
