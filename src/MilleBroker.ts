@@ -98,19 +98,22 @@ export class MilleBroker extends Broker {
                 // Get last starting time and set it as start and use previous symbols
                 self.startDate = marketState.time;
 
-                // emit all symbols
-                setTimeout(async () => {
-                    log('adding all previous symbols');
+                if (write) {
+                    // emit all symbols
+                    setTimeout(async () => {
+                        log('adding all previous symbols');
 
-                    const symbols = marketState.symbols;
+                        const symbols = marketState.symbols;
 
-                    while (symbols.length > 0) {
-                        const symbolX = symbols.shift();
-                        self.getPriceUpdate({ symbol: symbolX, startDate: self.startDate });
-                        await delay(1000, "some string");
-                    }
+                        while (symbols.length > 0) {
+                            const symbolX = symbols.shift();
+                            self.getPriceUpdate({ symbol: symbolX, startDate: self.startDate });
+                            await delay(1000, "some string");
+                        }
 
-                }, 5000);
+                    }, 5000);
+                }
+
             }
             else {
                 self.startDate = date;
