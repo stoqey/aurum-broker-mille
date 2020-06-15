@@ -113,7 +113,7 @@ export class MilleBroker extends Broker {
                 }
 
                 // Init mille
-                mille({ date, debug: false });
+                mille({ date: self.startDate, debug: false });
 
                 // start after delay
                 setTimeout(() => {
