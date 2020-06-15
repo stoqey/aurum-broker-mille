@@ -10,7 +10,7 @@ import FinnhubAPI, { Resolution } from '@stoqey/finnhub';
 import { Broker, BrokerAccountSummary, Portfolio, SymbolInfo, GetSymbolData, OpenOrder } from "@stoqey/aurum-broker-spec";
 import { log, verbose } from './log';
 import { publishDataToRedisChannel, redisSubscribe } from './redis/subscribe'
-import { State } from './redis/state';
+import State from './redis/state';
 import { delay } from './promise.utils';
 
 interface OptionsArgs {

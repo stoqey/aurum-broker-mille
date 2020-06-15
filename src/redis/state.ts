@@ -1,5 +1,5 @@
-import ioredis, { Redis } from "ioredis";
-import { REDIS_HOST } from "../config";
+import redis, { RedisClient } from 'redis';
+import { promisify } from 'util';
 
 /**
  * Save state
@@ -8,9 +8,9 @@ import { REDIS_HOST } from "../config";
  - getData(path)
  */
 
-export class State {
+class State {
 
-    redis: Redis;
+    redis: RedisClient = redis.createClient();
 
     private static _instance: State;
 
@@ -19,7 +19,7 @@ export class State {
     }
 
     private constructor() {
-        this.redis = new ioredis(null, REDIS_HOST);
+        console.log('---------------------- State', '----------------------')
     }
 
     /**
@@ -27,8 +27,9 @@ export class State {
      */
     public async getData(path: string): Promise<any> {
         let data = {};
+        const client = this.redis;
         try {
-            const savedData = await this.redis.get(path);
+            const savedData = await promisify(client.get).bind(client)(path);
             data = JSON.parse(savedData);
         }
         catch (error) {
@@ -45,8 +46,9 @@ export class State {
      */
     public async saveData(path: string, data: any): Promise<any> {
         let res = null;
+        const client = this.redis;
         try {
-            res = await this.redis.set(path, JSON.stringify(data));
+            res = await promisify(client.set).bind(client)(path, JSON.stringify(data));
         }
         catch (error) {
             console.log('error getting data from redis', error);
@@ -75,3 +77,5 @@ export class State {
         }
     }
 }
+
+export default State;

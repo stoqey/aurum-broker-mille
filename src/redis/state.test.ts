@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
-import { State } from './state';
+import State from './state';
 
 const state = State.Instance;
 

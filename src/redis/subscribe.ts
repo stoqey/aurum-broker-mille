@@ -3,12 +3,13 @@ import redisPubSub from 'node-redis-pubsub';
 import { MILLEEVENTS } from '@stoqey/mille'
 import { redisConfig, CustomBrokerEvents } from '../config'
 import MilleBroker from '../MilleBroker';
-import { State } from './state';
-import { log } from '../log';
+import State from './state';
+import { log, verbose } from '../log';
 
+const redisPubSubClient = new redisPubSub(redisConfig);
 
 export const redisSubscribe = (milleBroker: MilleBroker) => {
-    const redisPubSubClient = new redisPubSub(redisConfig);
+    verbose('<-------------------------- redisSubscribe redisSubscribe', '---------------------------->')
 
     const state = State.Instance;
 
@@ -61,11 +62,10 @@ export const redisSubscribe = (milleBroker: MilleBroker) => {
         await state.saveData(market, data);
     });
 
-    return redisPubSubClient;
+    return;
 }
 
 export const publishDataToRedisChannel = (channel: string, data) => {
-    const redisPubSubClient = new redisPubSub(redisConfig);
     redisPubSubClient.emit(channel, data);
 }
 
