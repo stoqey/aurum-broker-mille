@@ -93,7 +93,7 @@ export class MilleBroker extends Broker {
         if (resume) {
             const marketState = await redisState.getMilleMarketState();
 
-            log('marketState', marketState)
+            verbose('marketState', marketState)
             if (marketState && marketState.time) {
                 // Get last starting time and set it as start and use previous symbols
                 self.startDate = marketState.time;
@@ -101,7 +101,7 @@ export class MilleBroker extends Broker {
                 if (write) {
                     // emit all symbols
                     setTimeout(async () => {
-                        log('adding all previous symbols');
+                        verbose('adding all previous symbols');
 
                         const symbols = marketState.symbols;
 
@@ -120,7 +120,6 @@ export class MilleBroker extends Broker {
             }
         }
 
-        self.write = write || false;
 
         // init all listeners
         redisSubscribe(self);
@@ -238,7 +237,7 @@ export class MilleBroker extends Broker {
 
                 if (exitTrade) {
                     delete self.portfolios[symbol];
-                    log('portfolio delete exit', symbol)
+                    verbose('portfolio delete exit', symbol)
                 }
                 else {
                     // create new portfolio

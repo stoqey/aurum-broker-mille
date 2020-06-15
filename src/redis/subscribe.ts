@@ -4,12 +4,11 @@ import { MILLEEVENTS } from '@stoqey/mille'
 import { redisConfig, CustomBrokerEvents } from '../config'
 import MilleBroker from '../MilleBroker';
 import State from './state';
-import { log, verbose } from '../log';
+import { verbose } from '../log';
 
 const redisPubSubClient = new redisPubSub(redisConfig);
 
 export const redisSubscribe = (broker: MilleBroker) => {
-    verbose('<-------------------------- redisSubscribe redisSubscribe', '---------------------------->')
 
     const state = State.Instance;
 
@@ -59,7 +58,7 @@ export const redisSubscribe = (broker: MilleBroker) => {
     redisPubSubClient.on(MILLEEVENTS.TIME_TICK, async (data) => {
         // const {  symbols, time }  = data;
         const market = "markets";
-        log(market, data)
+        verbose(market, data)
 
         if (broker.write) {
             // SET persist time and symbols into redis
