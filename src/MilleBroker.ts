@@ -73,9 +73,10 @@ export class MilleBroker extends Broker {
             if (resume) {
                 const marketState = await redisState.getMilleMarketState();
 
+                log('marketState', marketState)
                 if (marketState && marketState.time) {
                     // Get last starting time and set it as start and use previous symbols
-                    this.startDate = marketState.time;
+                    self.startDate = marketState.time;
 
                     // emit all symbols
                     setTimeout(async () => {
@@ -92,16 +93,16 @@ export class MilleBroker extends Broker {
                     }, 5000);
                 }
                 else {
-                    this.startDate = date;
+                    self.startDate = date;
                 }
 
 
-                this.write = write || false;
+                self.write = write || false;
 
                 // init all listeners
-                redisSubscribe(this);
+                redisSubscribe(self);
 
-                this.init();
+                self.init();
 
                 if (isTest) {
                     // fake trade

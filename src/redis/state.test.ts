@@ -20,6 +20,7 @@ describe('State', () => {
 
     it(`Get item`, () => {
         state.getData(demoPath).then((data) => {
+            console.log('data', data)
             expect(data && data.id).to.be.equals(demoItem.id)
         })
     })

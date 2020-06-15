@@ -60,7 +60,7 @@ export class State {
     /**
      * getMilleMarketState
      */
-    public async getMilleMarketState(): Promise<{ time: Date, symbols: string[] }> {
+    public getMilleMarketState = async (): Promise<{ time: Date, symbols: string[] }> => {
         try {
 
             const milleMarket = await this.getData('markets');

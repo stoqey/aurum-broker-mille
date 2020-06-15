@@ -4,6 +4,7 @@ import { MILLEEVENTS } from '@stoqey/mille'
 import { redisConfig, CustomBrokerEvents } from '../config'
 import MilleBroker from '../MilleBroker';
 import { State } from './state';
+import { log } from '../log';
 
 
 export const redisSubscribe = (milleBroker: MilleBroker) => {
@@ -54,7 +55,8 @@ export const redisSubscribe = (milleBroker: MilleBroker) => {
     // on time
     redisPubSubClient.on(MILLEEVENTS.TIME_TICK, async (data) => {
         // const {  symbols, time }  = data;
-        const market = "market";
+        const market = "markets";
+        log(market, data)
         // SET persist time and symbols into redis
         await state.saveData(market, data);
     });
