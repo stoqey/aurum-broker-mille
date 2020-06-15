@@ -13,7 +13,7 @@ const demoOrder: OrderStock = {
     exitTrade: false
 }
 
-const broker = new MilleBroker(new Date("2020-03-10 09:30:00"), { resume: false, write: false });
+const broker = new MilleBroker(new Date("2020-03-12 09:30:00"), { resume: false, write: false });
 
 before((done) => {
 

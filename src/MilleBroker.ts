@@ -85,8 +85,9 @@ export class MilleBroker extends Broker {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
-        const { start: date, write, resume } = this;
+        const { start, write, resume } = this;
 
+        const date = new Date(start);
 
         const redisState = State.Instance;
 
@@ -115,9 +116,9 @@ export class MilleBroker extends Broker {
                 }
 
             }
-            else {
-                self.startDate = date;
-            }
+        }
+        else {
+            self.startDate = date;
         }
 
 
@@ -133,6 +134,8 @@ export class MilleBroker extends Broker {
                 onTrade && onTrade({ done: new Date });
             }, 1000)
         }
+
+        console.log('--------------Mille--------------> startDate ' + moment(self.startDate).format('DD/MM/YYYY'))
 
         // Init mille
         mille({ date: self.startDate, debug: false });
@@ -156,9 +159,6 @@ export class MilleBroker extends Broker {
 
         const milleEvents = this.milleEvents;
 
-        const emit = (channel: string, data: any) => {
-            publishDataToRedisChannel(channel, data)
-        }
 
         /**
          * Register all events here
@@ -168,7 +168,7 @@ export class MilleBroker extends Broker {
          * Time tick
          */
         milleEvents.on(MILLEEVENTS.TIME_TICK, (data) => {
-            emit(MILLEEVENTS.TIME_TICK, data)
+            publishDataToRedisChannel(MILLEEVENTS.TIME_TICK, data)
         });
 
 
@@ -176,7 +176,7 @@ export class MilleBroker extends Broker {
          * Get price update data
          */
         milleEvents.on(MILLEEVENTS.DATA, (data) => {
-            emit(MILLEEVENTS.DATA, data)
+            publishDataToRedisChannel(MILLEEVENTS.DATA, data)
         });
 
 
@@ -197,7 +197,7 @@ export class MilleBroker extends Broker {
                 const data = await finnhub.getCandles(symbol, startDate, endDate, range as Resolution);
 
                 // TODO save save to redis
-                emit(customEvents.ON_MARKET_DATA, { symbol, marketData: data });
+                publishDataToRedisChannel(customEvents.ON_MARKET_DATA, { symbol, marketData: data });
             }
             getData();
         };
@@ -211,21 +211,21 @@ export class MilleBroker extends Broker {
          * On market data received
          */
         milleEvents.on(customEvents.ON_MARKET_DATA, (data) => {
-            emit(customEvents.ON_MARKET_DATA, data)
+            publishDataToRedisChannel(customEvents.ON_MARKET_DATA, data)
         });
 
         /**
          * On portfolios data received
          */
         milleEvents.on(customEvents.ON_PORTFOLIO, (data) => {
-            emit(customEvents.ON_PORTFOLIO, data)
+            publishDataToRedisChannel(customEvents.ON_PORTFOLIO, data)
         });
 
         /**
          * On market data received
          */
         milleEvents.on(customEvents.ON_ORDER, (data) => {
-            emit(customEvents.ON_ORDER, data)
+            publishDataToRedisChannel(customEvents.ON_ORDER, data)
         });
 
         setInterval(async () => {
@@ -255,7 +255,7 @@ export class MilleBroker extends Broker {
                 const currentPortfolios = await self.getAllPositions();
 
                 // emit update portfolios
-                emit(customEvents.ON_PORTFOLIO, currentPortfolios);
+                publishDataToRedisChannel(customEvents.ON_PORTFOLIO, currentPortfolios);
             }
         }, orderFillingDelay)
     }
