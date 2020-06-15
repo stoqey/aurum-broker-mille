@@ -8,14 +8,14 @@ import { log, verbose } from '../log';
 
 const redisPubSubClient = new redisPubSub(redisConfig);
 
-export const redisSubscribe = (milleBroker: MilleBroker) => {
+export const redisSubscribe = (broker: MilleBroker) => {
     verbose('<-------------------------- redisSubscribe redisSubscribe', '---------------------------->')
 
     const state = State.Instance;
 
     // on order
     redisPubSubClient.on(CustomBrokerEvents.ON_ORDER, (data) => {
-        const onOrders = milleBroker.events["onOrders"];
+        const onOrders = broker.events["onOrders"];
 
         if (onOrders) {
             onOrders(data);
@@ -26,18 +26,20 @@ export const redisSubscribe = (milleBroker: MilleBroker) => {
     redisPubSubClient.on(CustomBrokerEvents.ON_PORTFOLIO, async (data) => {
 
         const onPortfolios = 'onPortfolios';
-        const onPortfoliosFn = milleBroker.events[onPortfolios];
+        const onPortfoliosFn = broker.events[onPortfolios];
 
         if (onPortfoliosFn) {
             await onPortfoliosFn(data);
         }
-        // SET persist portfolios into redis
-        await state.saveData(onPortfolios, data)
+        if (broker.write) {
+            // SET persist portfolios into redis
+            await state.saveData(onPortfolios, data)
+        }
     });
 
     // on market data
     redisPubSubClient.on(CustomBrokerEvents.ON_MARKET_DATA, (data) => {
-        const onMarketData = milleBroker.events["onMarketData"];
+        const onMarketData = broker.events["onMarketData"];
 
         if (onMarketData) {
             onMarketData(data);
@@ -46,7 +48,7 @@ export const redisSubscribe = (milleBroker: MilleBroker) => {
 
     // onPriceUpdates
     redisPubSubClient.on(MILLEEVENTS.DATA, (data) => {
-        const onPriceUpdates = milleBroker.events["onPriceUpdate"];
+        const onPriceUpdates = broker.events["onPriceUpdate"];
         const { symbol, tick } = data;
         if (onPriceUpdates) {
             onPriceUpdates({ symbol, ...tick }); // price, volume, date
@@ -58,8 +60,12 @@ export const redisSubscribe = (milleBroker: MilleBroker) => {
         // const {  symbols, time }  = data;
         const market = "markets";
         log(market, data)
-        // SET persist time and symbols into redis
-        await state.saveData(market, data);
+
+        if (broker.write) {
+            // SET persist time and symbols into redis
+            await state.saveData(market, data);
+        }
+
     });
 
     return;

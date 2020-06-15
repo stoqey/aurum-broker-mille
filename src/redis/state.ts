@@ -1,5 +1,6 @@
 import redis, { RedisClient } from 'redis';
 import { promisify } from 'util';
+import { log } from '../log';
 
 /**
  * Save state
@@ -19,7 +20,6 @@ class State {
     }
 
     private constructor() {
-        console.log('---------------------- State', '----------------------')
     }
 
     /**
@@ -33,7 +33,7 @@ class State {
             data = JSON.parse(savedData);
         }
         catch (error) {
-            console.log('error getting data from redis', error);
+            log('error getting data from redis', error);
         }
         finally {
             return data;
@@ -51,7 +51,7 @@ class State {
             res = await promisify(client.set).bind(client)(path, JSON.stringify(data));
         }
         catch (error) {
-            console.log('error getting data from redis', error);
+            log('error getting data from redis', error);
         }
         finally {
             return res;
@@ -72,7 +72,7 @@ class State {
 
         }
         catch (error) {
-            console.log('error getting mille markets', error)
+            log('error getting mille markets', error)
             return null;
         }
     }

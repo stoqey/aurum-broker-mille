@@ -51,114 +51,111 @@ export class MilleBroker extends Broker {
 
     milleEvents: MilleEvents;
 
+    start: Date;
     write = false;
+    resume = false;
 
     constructor(date: Date, options?: OptionsArgs) {
         super();
 
         this.milleEvents = MilleEvents.Instance;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const self = this;
 
-        const redisState = State.Instance;
+        const { state = null, write = false, resume = false } = options || {};
 
-        const { state = null, write = false, resume = false } = options;
+        this.start = date;
+        this.write = write;
+        this.resume = resume;
 
         if (state) {
             this.accountSummary = state;
         };
 
-        async function startMilleBroker() {
-
-            if (resume) {
-                const marketState = await redisState.getMilleMarketState();
-
-                log('marketState', marketState)
-                if (marketState && marketState.time) {
-                    // Get last starting time and set it as start and use previous symbols
-                    self.startDate = marketState.time;
-
-                    // emit all symbols
-                    setTimeout(async () => {
-                        log('adding all previous symbols');
-
-                        const symbols = marketState.symbols;
-
-                        while (symbols.length > 0) {
-                            const symbolX = symbols.shift();
-                            self.getPriceUpdate({ symbol: symbolX, startDate: self.startDate });
-                            await delay(2000, "some string");
-                        }
-
-                    }, 5000);
-                }
-                else {
-                    self.startDate = date;
-                }
-
-
-                self.write = write || false;
-
-                // init all listeners
-                redisSubscribe(self);
-
-                self.init();
-
-                if (isTest) {
-                    // fake trade
-                    setInterval(() => {
-                        const onTrade = self.events["onOrder"];
-                        onTrade && onTrade({ done: new Date });
-                    }, 1000)
-                }
-
-                // Init mille
-                mille({ date: self.startDate, debug: false });
-
-                // start after delay
-                setTimeout(() => {
-                    const onReady = self.events["onReady"];
-                    if (onReady) {
-                        onReady(true);
-                    }
-                }, 2000);
-
-            }
-        }
-
-        startMilleBroker();
-
     }
 
-    /**
-     * getPublicTime
-     */
-    public getPublicTime() {
-        const timeAsString = moment(this.startDate).format("DD-MM-YYYY");
-        return timeAsString;
-    }
-
-    private emit(channel: string, data: any) {
-        if (this.write) {
-            publishDataToRedisChannel(channel, data)
-        }
-    }
     /**
      * init
      */
     public init() {
+        this.startMilleBroker();
+    }
+
+    async startMilleBroker() {
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
-        const write = self.write;
+        const { start: date, write, resume } = this;
+
+
+        const redisState = State.Instance;
+
+        if (resume) {
+            const marketState = await redisState.getMilleMarketState();
+
+            log('marketState', marketState)
+            if (marketState && marketState.time) {
+                // Get last starting time and set it as start and use previous symbols
+                self.startDate = marketState.time;
+
+                // emit all symbols
+                setTimeout(async () => {
+                    log('adding all previous symbols');
+
+                    const symbols = marketState.symbols;
+
+                    while (symbols.length > 0) {
+                        const symbolX = symbols.shift();
+                        self.getPriceUpdate({ symbol: symbolX, startDate: self.startDate });
+                        await delay(1000, "some string");
+                    }
+
+                }, 5000);
+            }
+            else {
+                self.startDate = date;
+            }
+        }
+
+        self.write = write || false;
+
+        // init all listeners
+        redisSubscribe(self);
+
+        self.initialise();
+
+        if (isTest) {
+            // fake trade
+            setInterval(() => {
+                const onTrade = self.events["onOrder"];
+                onTrade && onTrade({ done: new Date });
+            }, 1000)
+        }
+
+        // Init mille
+        mille({ date: self.startDate, debug: false });
+
+        // start after delay
+        setTimeout(() => {
+            const onReady = self.events["onReady"];
+            if (onReady) {
+                onReady(true);
+            }
+        }, 2000);
+    }
+
+    /**
+     * initialise
+     */
+    private initialise() {
+
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
 
         const milleEvents = this.milleEvents;
 
         const emit = (channel: string, data: any) => {
-            if (write) {
-                publishDataToRedisChannel(channel, data)
-            }
+            publishDataToRedisChannel(channel, data)
         }
 
         /**
@@ -259,6 +256,20 @@ export class MilleBroker extends Broker {
                 emit(customEvents.ON_PORTFOLIO, currentPortfolios);
             }
         }, orderFillingDelay)
+    }
+
+    /**
+     * getPublicTime
+     */
+    public getPublicTime() {
+        const timeAsString = moment(this.startDate).format("DD-MM-YYYY");
+        return timeAsString;
+    }
+
+    private emit(channel: string, data: any) {
+        if (this.write) {
+            publishDataToRedisChannel(channel, data)
+        }
     }
 
     public searchSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T[]> {

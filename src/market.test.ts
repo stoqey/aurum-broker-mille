@@ -4,16 +4,6 @@ import { OrderStock } from '@stoqey/ibkr';
 import { Portfolio } from '@stoqey/aurum-broker-spec';
 import { log } from './log';
 
-const broker = new MilleBroker(new Date("2020-03-10 09:30:00"), { resume: false, write: true });
-
-before((done) => {
-    broker.when('onReady', async () => {
-        log('on ready');
-        done();
-    });
-    broker.init();
-});
-
 const demoOrder: OrderStock = {
     symbol: "AAPL",
     action: "BUY",
@@ -23,11 +13,24 @@ const demoOrder: OrderStock = {
     exitTrade: false
 }
 
+const broker = new MilleBroker(new Date("2020-03-10 09:30:00"), { resume: false, write: false });
+
+before((done) => {
+
+    broker.when('onReady', async () => {
+        log('on ready');
+        done();
+    });
+    broker.init();
+
+})
+
 
 describe('Mille broker', () => {
 
     it(`Price updates`, (done) => {
         let completed = false;
+
         broker.when("onPriceUpdate", async (data: any) => {
             if (!completed) {
                 log('on price updates data is', data);

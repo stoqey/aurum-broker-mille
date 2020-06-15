@@ -15,17 +15,21 @@ const demoOrder: OrderStock = {
     exitTrade: false
 }
 
+const broker = new MilleBroker(new Date("2020-03-10 09:30:00"), { resume: false, write: false });
 
+before((done) => {
+
+    broker.when('onReady', async () => {
+        log('on ready');
+        done();
+    });
+    broker.init();
+
+})
 describe('Mille broker', () => {
 
     it(`Buy Portfolio`, (done) => {
 
-        const broker = new MilleBroker(new Date("2020-03-10 09:30:00"));
-
-        broker.when('onReady', async () => {
-            log('on ready');
-            done();
-        });
 
         let completed = false;
         broker.when("onPortfolios", async (portfolios: Portfolio[]) => {
@@ -46,7 +50,6 @@ describe('Mille broker', () => {
 
         });
 
-        broker.init();
         broker.enterPosition(demoOrder)
 
     })
@@ -56,13 +59,6 @@ describe('Mille broker', () => {
         let completed = false;
         demoOrder.exitTrade = true;
         demoOrder.action = "SELL";
-
-        const broker = new MilleBroker(new Date("2020-03-10 09:30:00"));
-
-        broker.when('onReady', async () => {
-            log('on ready');
-            done();
-        });
 
         broker.when("onPortfolios", async (portfolios: Portfolio[]) => {
 
@@ -81,7 +77,6 @@ describe('Mille broker', () => {
 
         });
 
-        broker.init();
         broker.exitPosition(demoOrder)
     })
 })
