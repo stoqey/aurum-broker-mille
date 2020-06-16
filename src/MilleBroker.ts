@@ -12,6 +12,7 @@ import { log, verbose } from './log';
 import { publishDataToRedisChannel, redisSubscribe } from './redis/subscribe'
 import State from './redis/state';
 import { delay } from './promise.utils';
+import { formatTimeForLog } from './utils/time.utils';
 
 interface OptionsArgs {
     state?: BrokerAccountSummary;
@@ -137,8 +138,10 @@ export class MilleBroker extends Broker {
 
         console.log('--------------Mille--------------> startDate ' + moment(self.startDate).format('DD/MM/YYYY'))
 
-        // Init mille
-        mille({ date: self.startDate, debug: false });
+        if (write) {
+            // Init mille
+            mille({ date: self.startDate, debug: false });
+        }
 
         // start after delay
         setTimeout(() => {
@@ -188,7 +191,7 @@ export class MilleBroker extends Broker {
             const finnhub = new FinnhubAPI(process.env.FINNHUB_KEY);
 
             async function getData() {
-                verbose(`handleGetMarketData symbol=${symbol}`, `startDate=${startDate} endDate=${endDate} range=${range}`);
+                verbose(`handleGetMarketData symbol=${symbol}`, `startDate=${formatTimeForLog(startDate)} endDate=${formatTimeForLog(endDate)} range=${range}`);
 
                 /**
                  * use startDate as end @aka to
@@ -380,7 +383,7 @@ export class MilleBroker extends Broker {
         const { symbol, startDate } = args;
 
         const cloneStartDate = new Date(startDate);
-        const endDate = new Date(args.endDate || cloneStartDate.setDate(cloneStartDate.getDate() - 1));
+        const endDate = new Date(args.endDate || cloneStartDate.setDate(cloneStartDate.getDate() + 1));
 
         this.milleEvents.emit(customEvents.GET_MARKET_DATA, { symbol, startDate, endDate });
         // Can use finnhub
