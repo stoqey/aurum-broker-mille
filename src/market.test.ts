@@ -31,6 +31,7 @@ describe('Mille broker', () => {
     // it(`Price updates`, (done) => {
     //     let completed = false;
 
+    //     const startDate = new Date("2020-03-10 09:30:00");
     //     broker.when("onPriceUpdate", async (data: any) => {
     //         if (!completed) {
     //             log('on price updates data is', data);
@@ -39,7 +40,7 @@ describe('Mille broker', () => {
     //         }
     //     });
 
-    //     broker.getPriceUpdate({ symbol: "AAPL", startDate: null });
+    //     broker.getPriceUpdate({ symbol: "AAPL", startDate });
     // })
 
     it(`MarketData`, (done) => {
