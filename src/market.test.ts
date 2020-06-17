@@ -28,19 +28,19 @@ before((done) => {
 
 describe('Mille broker', () => {
 
-    it(`Price updates`, (done) => {
-        let completed = false;
+    // it(`Price updates`, (done) => {
+    //     let completed = false;
 
-        broker.when("onPriceUpdate", async (data: any) => {
-            if (!completed) {
-                log('on price updates data is', data);
-                completed = true;
-                done();
-            }
-        });
+    //     broker.when("onPriceUpdate", async (data: any) => {
+    //         if (!completed) {
+    //             log('on price updates data is', data);
+    //             completed = true;
+    //             done();
+    //         }
+    //     });
 
-        broker.getPriceUpdate({ symbol: "AAPL", startDate: null });
-    })
+    //     broker.getPriceUpdate({ symbol: "AAPL", startDate: null });
+    // })
 
     it(`MarketData`, (done) => {
         let completed = false;
