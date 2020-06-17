@@ -1,6 +1,7 @@
 import redis, { RedisClient } from 'redis';
 import { promisify } from 'util';
 import { log } from '../log';
+import { Portfolio } from '@stoqey/aurum-broker-spec';
 
 /**
  * Save state
@@ -74,6 +75,19 @@ class State {
         catch (error) {
             log('error getting mille markets', error)
             return null;
+        }
+    }
+
+    public getPortfolios = async (): Promise<Portfolio[]> => {
+        let portfolios = null;
+        try {
+            portfolios = await this.getData('onPortfolios');
+        }
+        catch (error) {
+            log('error getting mille portfolios', error)
+        }
+        finally {
+            return portfolios;
         }
     }
 }
