@@ -136,7 +136,7 @@ export class MilleBroker extends Broker {
             }, 1000)
         }
 
-        console.log('--------------Mille--------------> startDate ' + moment(self.startDate).format('DD/MM/YYYY'))
+        log('--------------Mille--------------> startDate ' + moment(self.startDate).format('DD/MM/YYYY'))
 
         if (write) {
             // Init mille
