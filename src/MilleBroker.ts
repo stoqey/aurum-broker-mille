@@ -236,7 +236,7 @@ export class MilleBroker extends Broker {
             if (!isEmpty(self.orders)) {
 
                 const orderToProcess: any = self.orders.shift();
-                const { symbol, size, exitTrade, averageCost = 0, marketPrice = 0 } = orderToProcess;
+                const { symbol, size, entryPrice, entryTime, exitTrade, averageCost = 0, marketPrice = 0 } = orderToProcess;
 
                 if (exitTrade) {
                     // TODO emit create sale
@@ -249,8 +249,10 @@ export class MilleBroker extends Broker {
                     const newPortfolio: Portfolio = {
                         symbol,
                         position: size,
-                        averageCost,
-                        marketPrice
+                        averageCost: averageCost || entryPrice,
+                        marketPrice,
+                        entryPrice,
+                        entryTime
                     };
 
                     self.portfolios[symbol] = newPortfolio;
