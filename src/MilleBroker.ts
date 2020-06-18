@@ -31,6 +31,8 @@ const virtualBrokerState: BrokerAccountSummary = {
     totalCashValue: 3000,
 };
 
+const redisState = State.Instance;
+
 
 /**
  * Mille Broker
@@ -89,8 +91,6 @@ export class MilleBroker extends Broker {
         const { start, write, resume } = this;
 
         const date = new Date(start);
-
-        const redisState = State.Instance;
 
         if (resume) {
             const marketState = await redisState.getMilleMarketState();
@@ -304,8 +304,27 @@ export class MilleBroker extends Broker {
 
 
     public getAllPositions = async <T>(): Promise<any & T[]> => {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
+        const savedPositions = await redisState.getPortfolios();
+        if (!isEmpty(savedPositions)) {
+            savedPositions.forEach(position => {
+                const symbol = position && position.symbol;
+                // Update position
+                self.portfolios[symbol] = {
+                    ...(self.portfolios[symbol] || {}),
+                    ...position
+                };
+
+            });
+        }
+
+        const portfolios = Object.values(self.portfolios);
+
+        this.milleEvents.emit(customEvents.ON_PORTFOLIO, portfolios);
+
         // Refresh all portfolios and update state to all
-        return Object.values(this.portfolios);
+        return portfolios;
     }
 
     /**
