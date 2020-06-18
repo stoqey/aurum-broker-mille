@@ -18,6 +18,7 @@ interface OptionsArgs {
     state?: BrokerAccountSummary;
     write?: boolean;
     resume?: boolean;
+    processOrders?: boolean;
 }
 /**
  * Init broker state
@@ -57,6 +58,7 @@ export class MilleBroker extends Broker {
     start: Date;
     write = false;
     resume = false;
+    processOrders = false;
 
     constructor(date: Date, options?: OptionsArgs) {
         super();
@@ -64,11 +66,12 @@ export class MilleBroker extends Broker {
         this.milleEvents = MilleEvents.Instance;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
 
-        const { state = null, write = false, resume = false } = options || {};
+        const { state = null, write = false, resume = false, processOrders = false } = options || {};
 
         this.start = date;
         this.write = write;
         this.resume = resume;
+        this.processOrders = processOrders;
 
         if (state) {
             this.accountSummary = state;
@@ -231,40 +234,45 @@ export class MilleBroker extends Broker {
             publishDataToRedisChannel(customEvents.ON_ORDER, data)
         });
 
-        setInterval(async () => {
 
-            if (!isEmpty(self.orders)) {
+        if (self.processOrders) {
+            setInterval(async () => {
 
-                const orderToProcess: any = self.orders.shift();
-                const { symbol, size, entryPrice, entryTime, exitTrade, marketPrice = 0 } = orderToProcess;
+                if (!isEmpty(self.orders)) {
 
-                if (exitTrade) {
-                    // TODO emit create sale
-                    delete self.portfolios[symbol];
-                    verbose('portfolio delete exit', symbol)
+                    const orderToProcess: any = self.orders.shift();
+                    const { symbol, size, entryPrice, entryTime, exitTrade, marketPrice = 0 } = orderToProcess;
+
+                    if (exitTrade) {
+                        // TODO emit create sale
+                        delete self.portfolios[symbol];
+                        verbose('portfolio delete exit', symbol)
+                    }
+                    else {
+                        // TODO create sale
+                        // create new portfolio
+                        const newPortfolio: Portfolio = {
+                            symbol,
+                            position: size,
+                            averageCost: entryPrice,
+                            marketPrice,
+                            entryPrice,
+                            entryTime
+                        };
+
+                        self.portfolios[symbol] = newPortfolio;
+                        log('portfolio update new', Object.keys(self.portfolios))
+                    }
+
+                    const currentPortfolios = await self.getAllPositions();
+
+                    // emit update portfolios
+                    publishDataToRedisChannel(customEvents.ON_PORTFOLIO, currentPortfolios);
                 }
-                else {
-                    // TODO create sale
-                    // create new portfolio
-                    const newPortfolio: Portfolio = {
-                        symbol,
-                        position: size,
-                        averageCost: entryPrice,
-                        marketPrice,
-                        entryPrice,
-                        entryTime
-                    };
+            }, orderFillingDelay)
+        };
 
-                    self.portfolios[symbol] = newPortfolio;
-                    log('portfolio update new', Object.keys(self.portfolios))
-                }
 
-                const currentPortfolios = await self.getAllPositions();
-
-                // emit update portfolios
-                publishDataToRedisChannel(customEvents.ON_PORTFOLIO, currentPortfolios);
-            }
-        }, orderFillingDelay)
     }
 
     /**
