@@ -5,7 +5,7 @@ export const REDIS_PORT = process.env.REDIS_PORT || 6379;
 
 export const redisConfig = {
     port: REDIS_PORT,
-    scope: 'mille'
+    scope: 'mille',
 };
 
 export type RedisChannels = 'symbols' | 'portfolios' | 'time' | 'orders';
@@ -16,5 +16,5 @@ export enum CustomBrokerEvents {
     ADD_PORTFOLIO = 'add_portfolio',
     ON_PORTFOLIO = 'on_portfolio',
     CREATE_ORDER = 'create_order',
-    ON_ORDER = 'on_order'
-};
+    ON_ORDER = 'on_order',
+}

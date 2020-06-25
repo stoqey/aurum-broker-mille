@@ -1,7 +1,7 @@
-import redis, { RedisClient } from 'redis';
-import { promisify } from 'util';
-import { log } from '../log';
-import { Portfolio } from '@stoqey/aurum-broker-spec';
+import redis, {RedisClient} from 'redis';
+import {promisify} from 'util';
+import {log} from '../log';
+import {Portfolio} from '@stoqey/aurum-broker-spec';
 
 /**
  * Save state
@@ -11,7 +11,6 @@ import { Portfolio } from '@stoqey/aurum-broker-spec';
  */
 
 class State {
-
     redis: RedisClient = redis.createClient();
 
     private static _instance: State;
@@ -20,8 +19,7 @@ class State {
         return this._instance || (this._instance = new this());
     }
 
-    private constructor() {
-    }
+    private constructor() {}
 
     /**
      * getData
@@ -32,14 +30,11 @@ class State {
         try {
             const savedData = await promisify(client.get).bind(client)(path);
             data = JSON.parse(savedData);
-        }
-        catch (error) {
+        } catch (error) {
             log('error getting data from redis', error);
-        }
-        finally {
+        } finally {
             return data;
         }
-
     }
 
     /**
@@ -50,46 +45,38 @@ class State {
         const client = this.redis;
         try {
             res = await promisify(client.set).bind(client)(path, JSON.stringify(data));
-        }
-        catch (error) {
+        } catch (error) {
             log('error getting data from redis', error);
-        }
-        finally {
+        } finally {
             return res;
         }
     }
 
-
     /**
      * getMilleMarketState
      */
-    public getMilleMarketState = async (): Promise<{ time: Date, symbols: string[] }> => {
+    public getMilleMarketState = async (): Promise<{time: Date; symbols: string[]}> => {
         try {
-
             const milleMarket = await this.getData('markets');
             if (milleMarket && milleMarket.time) {
-                return { time: milleMarket.time, symbols: milleMarket.symbols }
+                return {time: milleMarket.time, symbols: milleMarket.symbols};
             }
-
-        }
-        catch (error) {
-            log('error getting mille markets', error)
+        } catch (error) {
+            log('error getting mille markets', error);
             return null;
         }
-    }
+    };
 
     public getPortfolios = async (): Promise<Portfolio[]> => {
         let portfolios = null;
         try {
             portfolios = await this.getData('onPortfolios');
-        }
-        catch (error) {
-            log('error getting mille portfolios', error)
-        }
-        finally {
+        } catch (error) {
+            log('error getting mille portfolios', error);
+        } finally {
             return portfolios;
         }
-    }
+    };
 }
 
 export default State;

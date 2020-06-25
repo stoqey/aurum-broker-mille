@@ -1,6 +1,7 @@
 module.exports = {
   extends: [
     "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
     "prettier",
     "prettier/@typescript-eslint",
   ],
@@ -12,6 +13,7 @@ module.exports = {
     "@typescript-eslint"
   ],
   rules: {
+    "prettier/prettier": "error",
     "@typescript-eslint/array-type": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": "error",
