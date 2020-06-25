@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import moment from 'moment';
 import isEmpty from 'lodash/isEmpty';
-import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
 import { isTest, CustomBrokerEvents as customEvents, RedisChannels } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
 import { OrderStock, CreateSale } from '@stoqey/ibkr'
