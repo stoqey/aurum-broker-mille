@@ -5,7 +5,7 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { isTest, CustomBrokerEvents as customEvents, RedisChannels } from "./config";
 import { mille, MILLEEVENTS, MilleEvents } from '@stoqey/mille';
-import { OrderStock } from '@stoqey/ibkr'
+import { OrderStock, CreateSale } from '@stoqey/ibkr'
 import FinnhubAPI, { Resolution } from '@stoqey/finnhub';
 import { Broker, BrokerAccountSummary, Portfolio, SymbolInfo, GetSymbolData, OpenOrder } from "@stoqey/aurum-broker-spec";
 import { log, verbose } from './log';
@@ -14,11 +14,16 @@ import State from './redis/state';
 import { delay } from './promise.utils';
 import { formatTimeForLog } from './utils/time.utils';
 
+interface CustomBrokerMethods {
+    createSale?: (data: any) => Promise<any>;
+    savePortfolio?: (data: any, deletePortfolio?: boolean) => Promise<any>;
+}
 interface OptionsArgs {
     state?: BrokerAccountSummary;
     write?: boolean;
     resume?: boolean;
     processOrders?: boolean;
+    methods?: CustomBrokerMethods;
 }
 /**
  * Init broker state
@@ -40,7 +45,7 @@ const redisState = State.Instance;
  * 
  * - Get start from redis
  */
-export class MilleBroker extends Broker {
+export class MilleBroker extends Broker implements CustomBrokerMethods {
 
     /**
      * Emulated broker account summary
@@ -60,18 +65,28 @@ export class MilleBroker extends Broker {
     resume = false;
     processOrders = false;
 
+    // other methods
+    createSale?: (data: any) => Promise<any> = async () => { };
+    savePortfolio?: (data: any, deletePortfolio?: boolean) => Promise<any> = async () => { };;
+
     constructor(date: Date, options?: OptionsArgs) {
         super();
 
         this.milleEvents = MilleEvents.Instance;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
 
-        const { state = null, write = false, resume = false, processOrders = false } = options || {};
+        const { state = null, write = false, resume = false, processOrders = false, methods = null } = options || {};
 
         this.start = date;
         this.write = write;
         this.resume = resume;
         this.processOrders = processOrders;
+
+        // set methods
+        if (methods) {
+            this.createSale = methods && methods.createSale;
+            this.savePortfolio = methods && methods.savePortfolio;
+        }
 
         if (state) {
             this.accountSummary = state;
@@ -190,7 +205,7 @@ export class MilleBroker extends Broker {
          * HandleGetMarketData request
          * @param param0 
          */
-        const handleGetMarketData = ({ symbol, startDate, endDate, range = '1' }) => {
+        const handleGetMarketData = ({ symbol, startDate, endDate, range = '1' }): void => {
             const finnhub = new FinnhubAPI(process.env.FINNHUB_KEY);
 
             async function getData() {
@@ -244,12 +259,12 @@ export class MilleBroker extends Broker {
                     const { symbol, size, entryPrice, entryTime, exitTrade, marketPrice = 0 } = orderToProcess;
 
                     if (exitTrade) {
-                        // TODO emit create sale
+                        const portfolio = self.portfolios[symbol];
                         delete self.portfolios[symbol];
                         verbose('portfolio delete exit', symbol)
+                        await self.savePortfolio(portfolio, true); // save portfolio to initializer
                     }
                     else {
-                        // TODO create sale
                         // create new portfolio
                         const newPortfolio: Portfolio = {
                             symbol,
@@ -262,7 +277,10 @@ export class MilleBroker extends Broker {
 
                         self.portfolios[symbol] = newPortfolio;
                         log('portfolio update new', Object.keys(self.portfolios))
+                        await self.savePortfolio(newPortfolio); // save portfolio to initializer
                     }
+
+                    await self.createSale(orderToProcess); // create sale to initializer
 
                     const currentPortfolios = await self.getAllPositions();
 
