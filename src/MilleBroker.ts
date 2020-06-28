@@ -258,18 +258,23 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
         if (self.processOrders) {
             setInterval(async () => {
                 if (!isEmpty(self.orders)) {
-                    const orderToProcess: any = self.orders.shift();
-                    const {
-                        symbol,
-                        size,
-                        entryPrice,
-                        entryTime,
-                        exitTrade,
-                        marketPrice = 0,
-                    } = orderToProcess;
+                    const orderToProcess = self.orders.shift();
 
-                    if (exitTrade) {
+                    let portfolioCopy = null;
+
+                    const {symbol, size, exitParams = null, exitTrade} = orderToProcess;
+
+                    if (exitTrade && exitParams) {
+                        // const {exitPrice, exitTime, entryPrice, entryTime} = exitParams;
                         const portfolio = self.portfolios[symbol];
+                        portfolioCopy = portfolio;
+                        // portfolioCopy.exitTime =
+
+                        // exitTime?: Date;
+                        // exitPrice?: number;
+                        // entryPrice: number;
+                        // entryTime: Date;
+
                         delete self.portfolios[symbol];
                         verbose('portfolio delete exit', symbol);
                         await self.savePortfolio(portfolio, true); // save portfolio to initializer
@@ -278,10 +283,10 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
                         const newPortfolio: Portfolio = {
                             symbol,
                             position: size,
-                            averageCost: entryPrice,
-                            marketPrice,
-                            entryPrice,
-                            entryTime,
+                            averageCost: 0,
+                            marketPrice: 0,
+                            entryPrice: 0,
+                            entryTime: new Date(),
                         };
 
                         self.portfolios[symbol] = newPortfolio;

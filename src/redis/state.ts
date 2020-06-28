@@ -77,6 +77,39 @@ class State {
             return portfolios;
         }
     };
+
+    /**
+     * Save MarketBar
+     * @param symbol
+     * @param bar
+     */
+    public saveMarketBar = async (
+        symbol: string,
+        bar: {date: Date; close: number}
+    ): Promise<{date: Date; close: number}> => {
+        try {
+            await this.saveData(`bar:${symbol}`, bar);
+        } catch (error) {
+            log('error getting mille portfolios', error);
+        } finally {
+            return bar;
+        }
+    };
+
+    /**
+     * Get MarketBar
+     * @param symbol
+     */
+    public getMarketBar = async (symbol: string): Promise<{date: Date; close: number}> => {
+        let portfolios = null;
+        try {
+            portfolios = await this.getData(`bar:${symbol}`);
+        } catch (error) {
+            log('error getting mille portfolios', error);
+        } finally {
+            return portfolios;
+        }
+    };
 }
 
 export default State;
