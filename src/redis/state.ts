@@ -101,13 +101,13 @@ class State {
      * @param symbol
      */
     public getMarketBar = async (symbol: string): Promise<{date: Date; close: number}> => {
-        let portfolios = null;
+        let bar = null;
         try {
-            portfolios = await this.getData(`bar:${symbol}`);
+            bar = await this.getData(`bar:${symbol}`);
         } catch (error) {
             log('error getting mille portfolios', error);
         } finally {
-            return portfolios;
+            return bar;
         }
     };
 }

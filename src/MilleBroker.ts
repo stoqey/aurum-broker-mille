@@ -322,8 +322,16 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
     public searchSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T[]> {
         throw new Error('Method not implemented.');
     }
-    public quoteSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T> {
-        throw new Error('Method not implemented.');
+    public async quoteSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T> {
+        let barData = null;
+        try {
+            const {symbol} = args;
+            barData = await redisState.getMarketBar(symbol);
+        } catch (error) {
+            console.log('error quotingSymbol', error);
+        } finally {
+            return barData;
+        }
     }
 
     public getScreener(): <T>(args: any) => Promise<any & T[]> {

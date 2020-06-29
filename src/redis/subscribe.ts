@@ -44,11 +44,18 @@ export const redisSubscribe = (broker: MilleBroker) => {
     });
 
     // onPriceUpdates
-    redisPubSubClient.on(MILLEEVENTS.DATA, (data) => {
+    redisPubSubClient.on(MILLEEVENTS.DATA, async (data) => {
         const onPriceUpdates = broker.events['onPriceUpdate'];
         const {symbol, tick} = data;
+
+        // Bar save data
+        if (broker.write) {
+            // SET persist portfolios into redis
+            await state.saveMarketBar(symbol, tick);
+        }
+
         if (onPriceUpdates) {
-            onPriceUpdates({symbol, ...tick}); // price, volume, date
+            await onPriceUpdates({symbol, ...tick}); // price, volume, date
         }
     });
 
