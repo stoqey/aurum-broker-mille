@@ -19,7 +19,7 @@ import {delay} from './promise.utils';
 import {formatTimeForLog} from './utils/time.utils';
 
 interface CustomBrokerMethods {
-    createSale?: (data: any) => Promise<any>;
+    createSale?: (order: any, portfolio: any) => Promise<any>;
     savePortfolio?: (data: any, deletePortfolio?: boolean) => Promise<any>;
 }
 interface OptionsArgs {
@@ -68,7 +68,7 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
     processOrders = false;
 
     // other methods
-    createSale?: (data: any) => Promise<any> = async () => {};
+    createSale?: (order: any, portfolio: any) => Promise<any> = async () => {};
     savePortfolio?: (data: any, deletePortfolio?: boolean) => Promise<any> = async () => {};
 
     constructor(date: Date, options?: OptionsArgs) {
@@ -260,41 +260,50 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
                 if (!isEmpty(self.orders)) {
                     const orderToProcess = self.orders.shift();
 
-                    let portfolioCopy = null;
+                    const {
+                        symbol,
+                        size,
+                        exitParams = null,
+                        exitTrade,
+                        capital = 1000,
+                    } = orderToProcess;
 
-                    const {symbol, size, exitParams = null, exitTrade} = orderToProcess;
+                    // Get current quote
+                    const currentBar = await self.quoteSymbol({symbol});
 
                     if (exitTrade && exitParams) {
-                        // const {exitPrice, exitTime, entryPrice, entryTime} = exitParams;
+                        const {exitPrice, exitTime, entryPrice, entryTime} = exitParams;
                         const portfolio = self.portfolios[symbol];
-                        portfolioCopy = portfolio;
-                        // portfolioCopy.exitTime =
 
-                        // exitTime?: Date;
-                        // exitPrice?: number;
-                        // entryPrice: number;
-                        // entryTime: Date;
+                        let portfolioCopy = null;
+                        portfolioCopy = portfolio;
+
+                        // update with close params
+                        portfolioCopy.exitTime = exitTime;
+                        portfolioCopy.exitPrice = exitPrice;
+                        portfolioCopy.entryPrice = entryPrice;
+                        portfolioCopy.entryTime = entryTime;
 
                         delete self.portfolios[symbol];
                         verbose('portfolio delete exit', symbol);
                         await self.savePortfolio(portfolio, true); // save portfolio to initializer
+                        await self.createSale(orderToProcess, portfolioCopy); // create sale to initializer
+                        verbose('sale created', symbol);
                     } else {
                         // create new portfolio
                         const newPortfolio: Portfolio = {
                             symbol,
                             position: size,
-                            averageCost: 0,
-                            marketPrice: 0,
-                            entryPrice: 0,
-                            entryTime: new Date(),
+                            averageCost: currentBar.close,
+                            marketPrice: currentBar.close,
+                            entryPrice: currentBar.close,
+                            entryTime: new Date(currentBar.date),
                         };
 
                         self.portfolios[symbol] = newPortfolio;
                         log('portfolio update new', Object.keys(self.portfolios));
                         await self.savePortfolio(newPortfolio); // save portfolio to initializer
                     }
-
-                    await self.createSale(orderToProcess); // create sale to initializer
 
                     const currentPortfolios = await self.getAllPositions();
 
@@ -322,11 +331,17 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
     public searchSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T[]> {
         throw new Error('Method not implemented.');
     }
-    public async quoteSymbol<T>(args: SymbolInfo & T): Promise<SymbolInfo & T> {
-        let barData = null;
+    public async quoteSymbol<T>(
+        args: SymbolInfo & T
+    ): Promise<{date: Date; close: number; symbol: string} & any> {
+        const {symbol} = args;
+        const barData = {date: new Date(), close: 0, symbol};
         try {
-            const {symbol} = args;
-            barData = await redisState.getMarketBar(symbol);
+            const redisBarData = await redisState.getMarketBar(symbol);
+            if (redisBarData) {
+                barData.close = redisBarData.close;
+                barData.date = redisBarData.date;
+            }
         } catch (error) {
             console.log('error quotingSymbol', error);
         } finally {

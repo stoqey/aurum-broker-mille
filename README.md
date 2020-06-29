@@ -25,7 +25,7 @@ A broker implementation for aurum using <a href="https://github.com/stoqey/mille
 | enterPosition     | ✅        |
 | exitPosition      | ✅        |
 | searchSymbol      | ❌        |
-| quoteSymbol       | ❌        |
+| quoteSymbol       | ✅        |
 | getMarketData     | ✅        |
 | getPriceUpdate    | ✅        |
 
