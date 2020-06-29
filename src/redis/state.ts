@@ -110,6 +110,17 @@ class State {
             return bar;
         }
     };
+
+    /**
+     * deleteAll
+     */
+    public async deleteAll(): Promise<void> {
+        try {
+            await this.redis.flushall();
+        } catch (error) {
+            log('error flushing all', error);
+        }
+    }
 }
 
 export default State;

@@ -136,6 +136,9 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
             }
         } else {
             self.startDate = date;
+
+            // Delete all from redis stuff
+            await redisState.deleteAll();
         }
 
         // init all listeners
