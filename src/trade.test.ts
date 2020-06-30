@@ -15,7 +15,7 @@ const demoOrder: OrderStock = {
     exitTrade: false
 }
 
-const broker = new MilleBroker(new Date("2020-03-10 09:30:00"), { resume: false, write: false });
+const broker = new MilleBroker(new Date("2020-03-10 09:30:00"), { resume: false, write: false, processOrders: true });
 
 before((done) => {
 
@@ -59,6 +59,7 @@ describe('Mille broker', () => {
         let completed = false;
         demoOrder.exitTrade = true;
         demoOrder.action = "SELL";
+        demoOrder.exitParams = { entryPrice: 0 } as any;
 
         broker.when("onPortfolios", async (portfolios: Portfolio[]) => {
 

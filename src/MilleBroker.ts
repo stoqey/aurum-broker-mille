@@ -427,7 +427,7 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
 
         // Add order to queue
         setTimeout(() => {
-            log('placing order', `symbol=${symbol}, action=${action}`);
+            log('placing enter order', `symbol=${symbol}, action=${action}`);
             self.placeOrder(order);
         }, placingOrderDelay);
 
@@ -449,6 +449,7 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
 
         // Add order to queue
         setTimeout(() => {
+            log('placing exit order', `symbol=${symbol}, action=${action}`);
             self.placeOrder(order);
         }, placingOrderDelay);
 
