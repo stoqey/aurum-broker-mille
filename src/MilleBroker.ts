@@ -2,7 +2,7 @@
 import moment from 'moment';
 import isEmpty from 'lodash/isEmpty';
 import {isTest, CustomBrokerEvents as customEvents} from './config';
-import {mille, MILLEEVENTS, MilleEvents} from '@stoqey/mille';
+import {mille, MILLEEVENTS, MilleEvents, Start} from '@stoqey/mille';
 import {OrderStock} from '@stoqey/ibkr';
 import FinnhubAPI, {Resolution} from '@stoqey/finnhub';
 import {
@@ -28,6 +28,7 @@ interface OptionsArgs {
     resume?: boolean;
     processOrders?: boolean;
     methods?: CustomBrokerMethods;
+    mille?: Start; // mille options
 }
 /**
  * Init broker state
@@ -66,6 +67,7 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
     write = false;
     resume = false;
     processOrders = false;
+    mille: Start = null;
 
     // other methods
     createSale?: (order: any, portfolio: any) => Promise<any> = async () => {};
@@ -77,13 +79,20 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
         this.milleEvents = MilleEvents.Instance;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
 
-        const {state = null, write = false, resume = false, processOrders = false, methods = null} =
-            options || {};
+        const {
+            state = null,
+            write = false,
+            resume = false,
+            processOrders = false,
+            methods = null,
+            mille = null,
+        } = options || {};
 
         this.start = date;
         this.write = write;
         this.resume = resume;
         this.processOrders = processOrders;
+        this.mille = mille;
 
         // set methods
         if (methods) {
@@ -160,8 +169,16 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
         );
 
         if (write) {
-            // Init mille
-            mille({date: self.startDate, debug: false});
+            if (self.mille) {
+                mille(self.mille);
+            } else {
+                // Init default mille
+                mille({
+                    startDate: new Date('2020-03-11 10:35:00'),
+                    endDate: new Date('2020-03-11 16:35:00'),
+                    mode: 'secs',
+                });
+            }
         }
 
         // start after delay
