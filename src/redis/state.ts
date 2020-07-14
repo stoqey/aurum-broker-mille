@@ -114,11 +114,13 @@ class State {
     /**
      * deleteAll
      */
-    public async deleteAll(): Promise<void> {
+    public async deleteAll(): Promise<boolean> {
         try {
             await this.redis.flushall();
+            return true;
         } catch (error) {
             log('error flushing all', error);
+            return false;
         }
     }
 }

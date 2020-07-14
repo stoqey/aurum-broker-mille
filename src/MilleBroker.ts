@@ -280,16 +280,13 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
                 if (!isEmpty(self.orders)) {
                     const orderToProcess = self.orders.shift();
 
-                    const {
-                        symbol,
-                        size,
-                        exitParams = null,
-                        exitTrade,
-                        capital = 1000,
-                    } = orderToProcess;
+                    const {symbol, exitParams = null, exitTrade, capital = 1000} = orderToProcess;
 
                     // Get current quote
                     const currentBar = await self.quoteSymbol({symbol});
+
+                    const defaultPortfolioSize =
+                        orderToProcess.size || Math.round(capital / currentBar.close);
 
                     if (exitTrade && exitParams) {
                         const {exitPrice, exitTime, entryPrice, entryTime} = exitParams;
@@ -312,8 +309,10 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
                     } else {
                         // create new portfolio
                         const newPortfolio: Portfolio = {
+                            name: symbol,
                             symbol,
-                            position: size,
+                            position: defaultPortfolioSize,
+                            capital,
                             averageCost: currentBar.close,
                             marketPrice: currentBar.close,
                             entryPrice: currentBar.close,
