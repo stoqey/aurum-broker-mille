@@ -1,6 +1,6 @@
 {
   "name": "@stoqey/aurum-broker-mille",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": false,
   "main": "build/index.js",
   "types": "build/index.d.ts",

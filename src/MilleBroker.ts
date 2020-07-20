@@ -288,7 +288,7 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
                     const defaultPortfolioSize =
                         orderToProcess.size || Math.round(capital / currentBar.close);
 
-                    if (exitTrade && exitParams) {
+                    if (exitTrade && exitParams && exitParams.exitTime) {
                         const {exitPrice, exitTime, entryPrice, entryTime} = exitParams;
                         const portfolio = self.portfolios[symbol];
 
