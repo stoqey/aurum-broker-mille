@@ -37,6 +37,20 @@
   dependencies:
     any-observable "^0.3.0"
 
+"@stoqey/aurum-broker-ibkr@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@stoqey/aurum-broker-ibkr/-/aurum-broker-ibkr-1.1.1.tgz#e52e44a5750edbc7809bcbb1558f93592176e0d2"
+  integrity sha512-TU4kU+mnFKXOWtX+cMdAsZVNlU9Zup+eIzR0QmOBYEZ5YKx1TtuGRYwYj/FPQ0SDEjNk8nhl0s9D+Nbdja6NHw==
+  dependencies:
+    "@stoqey/aurum-broker-spec" "^0.0.7"
+    "@stoqey/ibkr" "^1.1.8"
+    dotenv "^8.2.0"
+
+"@stoqey/aurum-broker-spec@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@stoqey/aurum-broker-spec/-/aurum-broker-spec-0.0.7.tgz#b5fe4303731528884ff173af5edc6d8350a5170e"
+  integrity sha512-d0ebVsklEXGGqFIEhl7HoqBl/JZ3CtCDIhJ+KrNpTgklX1Io9jVPmG9Z2pNaAb/BYexShSR2vc37BlyUGPbh5g==
+
 "@stoqey/aurum-broker-spec@^0.0.8":
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/@stoqey/aurum-broker-spec/-/aurum-broker-spec-0.0.8.tgz#fbb71841d492d7afa9a131f71e79f47f7f738a2e"

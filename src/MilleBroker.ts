@@ -3,7 +3,7 @@ import moment from 'moment';
 import isEmpty from 'lodash/isEmpty';
 import {isTest, CustomBrokerEvents as customEvents} from './config';
 import {mille, MILLEEVENTS, MilleEvents, Start} from '@stoqey/mille';
-import {OrderStock} from '@stoqey/ibkr';
+import {OrderStock, OrderWithContract} from '@stoqey/ibkr';
 import FinnhubAPI, {Resolution} from '@stoqey/finnhub';
 import {
     Broker,
@@ -278,12 +278,37 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
         if (self.processOrders) {
             setInterval(async () => {
                 if (!isEmpty(self.orders)) {
-                    const orderToProcess = self.orders.shift();
+                    const orderToProcess: OrderStock = self.orders.shift();
 
-                    const {symbol, exitParams = null, exitTrade, capital = 1000} = orderToProcess;
+                    const {
+                        symbol,
+                        exitParams = null,
+                        exitTrade,
+                        capital = 1000,
+                        size,
+                        action,
+                    } = orderToProcess;
 
                     // Get current quote
                     const currentBar = await self.quoteSymbol({symbol});
+
+                    const orderWithContract: OrderWithContract = {
+                        orderState: {
+                            status: 'Filled',
+                            initMargin: '',
+                            maintMargin: '',
+                            equityWithLoan: '',
+                            commission: 0,
+                            minCommission: 0,
+                            maxCommission: 0,
+                            commissionCurrency: '',
+                            warningText: '',
+                        },
+                        symbol,
+                        action,
+                        totalQuantity: size,
+                        lmtPrice: currentBar.close,
+                    } as any;
 
                     const defaultPortfolioSize =
                         orderToProcess.size || Math.round(capital / currentBar.close);
@@ -303,8 +328,14 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
 
                         delete self.portfolios[symbol];
                         verbose('portfolio delete exit', symbol);
-                        await self.savePortfolio(portfolio, true); // save portfolio to initializer
-                        await self.createSale(orderToProcess, portfolioCopy); // create sale to initializer
+
+                        // emit update portfolios
+                        publishDataToRedisChannel(customEvents.ON_ORDER, [
+                            {...orderWithContract, date: new Date(currentBar.date)},
+                        ]);
+                        // TODO emit as order
+                        // await self.savePortfolio(portfolio, true); // save portfolio to initializer
+                        // await self.createSale(orderToProcess, portfolioCopy); // create sale to initializer
                         verbose('sale created', symbol);
                     } else {
                         // create new portfolio
@@ -321,7 +352,7 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
 
                         self.portfolios[symbol] = newPortfolio;
                         log('portfolio update new', Object.keys(self.portfolios));
-                        await self.savePortfolio(newPortfolio); // save portfolio to initializer
+                        // await self.savePortfolio(newPortfolio); // save portfolio to initializer
                     }
 
                     const currentPortfolios = await self.getAllPositions();
