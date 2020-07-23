@@ -329,6 +329,7 @@ export class MilleBroker extends Broker implements CustomBrokerMethods {
 
                         delete self.portfolios[symbol];
                         verbose('portfolio delete exit', symbol);
+                        log('portfolio update new', Object.keys(self.portfolios));
 
                         // emit update portfolios
                         publishDataToRedisChannel(customEvents.ON_ORDER, [
