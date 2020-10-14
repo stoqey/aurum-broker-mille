@@ -88,6 +88,18 @@
     lodash "^4.17.15"
     moment "^2.24.0"
 
+"@stoqey/ib@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@stoqey/ib/-/ib-0.1.1.tgz#84a06f8a3b02c43e1b29018054b6f8b92242c326"
+  integrity sha512-XmPvJWJnAgikyRhLQbmIUIlzqBDCcpwZU0p04r/khcvt4P4kmyE82XI4z4GldCJVo7bGPtFfugdq0tkvlVtvcQ==
+  dependencies:
+    chalk "^4.0.0"
+    command-buffer "^0.1.0"
+    dotenv "^8.2.0"
+    function-rate-limit "^1.1.0"
+    lodash "^4.17.20"
+    moment "^2.24.0"
+
 "@stoqey/ibkr@^1.1.8":
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/@stoqey/ibkr/-/ibkr-1.1.8.tgz#a04552ca8d129b18e6034925b37b795754ee9449"
@@ -98,6 +110,18 @@
     debug "^4.1.1"
     dotenv "^8.2.0"
     lodash "^4.17.15"
+    moment "^2.24.0"
+
+"@stoqey/ibkr@^1.6.2":
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/@stoqey/ibkr/-/ibkr-1.6.2.tgz#85907477c89e0c858fc4ea7704490e1a4cd03d14"
+  integrity sha512-kL3HvQbsEFkdPNbmfMibqUCLA2qgfcxaRms22oxAVcMdyuRjOEPAT4FPzLoM97QutJe4YBCB0VmJj5zaSZYvOw==
+  dependencies:
+    "@stoqey/ib" "^0.1.1"
+    "@stoqey/timeout-manager" "^0.0.2"
+    debug "^4.1.1"
+    dotenv "^8.2.0"
+    lodash "^4.17.20"
     moment "^2.24.0"
 
 "@stoqey/mille@^0.0.8":
@@ -2390,10 +2414,10 @@ lodash.flatten@^4.4.0:
   resolved "https://registry.yarnpkg.com/lodash.flatten/-/lodash.flatten-4.4.0.tgz#f31c22225a9632d2bbf8e4addbef240aa765a61f"
   integrity sha1-8xwiIlqWMtK7+OSt2+8kCqdlph8=
 
-lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.3:
-  version "4.17.15"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
-  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
+lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.3:
+  version "4.17.20"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
 log-symbols@3.0.0, log-symbols@^3.0.0:
   version "3.0.0"
