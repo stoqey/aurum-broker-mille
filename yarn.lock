@@ -88,6 +88,18 @@
     lodash "^4.17.15"
     moment "^2.24.0"
 
+"@stoqey/ib@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@stoqey/ib/-/ib-0.1.1.tgz#84a06f8a3b02c43e1b29018054b6f8b92242c326"
+  integrity sha512-XmPvJWJnAgikyRhLQbmIUIlzqBDCcpwZU0p04r/khcvt4P4kmyE82XI4z4GldCJVo7bGPtFfugdq0tkvlVtvcQ==
+  dependencies:
+    chalk "^4.0.0"
+    command-buffer "^0.1.0"
+    dotenv "^8.2.0"
+    function-rate-limit "^1.1.0"
+    lodash "^4.17.20"
+    moment "^2.24.0"
+
 "@stoqey/ibkr@^1.1.8":
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/@stoqey/ibkr/-/ibkr-1.1.8.tgz#a04552ca8d129b18e6034925b37b795754ee9449"
@@ -98,6 +110,17 @@
     debug "^4.1.1"
     dotenv "^8.2.0"
     lodash "^4.17.15"
+    moment "^2.24.0"
+
+"@stoqey/ibkr@^1.6.2":
+  version "1.6.8"
+  resolved "https://registry.yarnpkg.com/@stoqey/ibkr/-/ibkr-1.6.8.tgz#5a02f8649a2b378d1b9a0f3f9f23cc8e0273d591"
+  integrity sha512-UGH2rkiPYoqsSNOdTwFP6fFf3xmH5uhG3Q+nwSQ+FahaVgjnfjwqzFaGnG/X+B4cNz+tXZzOS4yocEmFNISdeA==
+  dependencies:
+    "@stoqey/ib" "^0.1.1"
+    debug "^4.1.1"
+    dotenv "^8.2.0"
+    lodash "^4.17.20"
     moment "^2.24.0"
 
 "@stoqey/mille@^0.0.8":
@@ -1924,9 +1947,9 @@ inherits@2.0.3:
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
 ini@^1.3.4, ini@~1.3.0:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.5.tgz#eee25f56db1c9ec6085e0c22778083f596abf927"
-  integrity sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.8.tgz#a29da425b48806f34767a4efce397269af28432c"
+  integrity sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==
 
 inquirer@^7.0.0:
   version "7.1.0"
@@ -2394,6 +2417,11 @@ lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.3:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
+
+lodash@^4.17.20:
+  version "4.17.20"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
 log-symbols@3.0.0, log-symbols@^3.0.0:
   version "3.0.0"
